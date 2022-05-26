@@ -1,5 +1,11 @@
 20220526: Removed debugging output. Now with MCM support. Huge code update. 450-ish lines, down to 142.
 
+STILL LOOKING FOR A WAY TO FORCE OUTFIT UPDATES WITHOUT CALLING resurrect()
+
+
+
+
+
 INITIAL COMMIT: I've been exporting outfit sets, reformatting the data, rearranging the data based on the nested leveled lists, importing the rearranged data as leveled lists of outfit items... It's a process... At this point, I could probably just rename the Leveled Lists as Body Slots, and almost be there, though...
 
 If you want to modify the script so that it's slot based, I'll welcome the addition. I've honestly been contemplating it.
