@@ -110,53 +110,36 @@ Function SetSettlerOutfit(Actor NPC)
 EndFunction
 ;=================================================================================================================
 Function NPCSetOutfit(Actor NPCtoSet)
-	Outfit OutfitToSet = NewOutfits.GetAt(Utility.RandomInt(0,NewOutfits.GetSize()-1)) as Outfit
-	ObjectReference furnitureRef = NPCtoSet.GetFurnitureReference()
-	float X=NPCtoSet.getpositionx()
-	float Y=NPCtoSet.getpositiony()
-	float Z=NPCtoSet.getpositionz()
-	float ROT=NPCtoSet.getAngleZ()
-	NPCtoSet.setoutfit(OutfitToSet,false)
-	Form[] InvItems = NPCtoSet.GetInventoryItems()
-	Int i = 0
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i]
-		Armor ArmorItem = akItem as Armor
-		If ArmorItem != None
-			NPCtoSet.unequipitem(ArmorItem)
-			NPCtoSet.removeitem(ArmorItem, 9999)
-		EndIf
-		Weapon WeaponItem = akItem as Weapon
-		If WeaponItem != None
-			NPCtoSet.unequipitem(WeaponItem)
-			NPCtoSet.removeitem(WeaponItem, 9999)
-		EndIf
-		i += 1
-	EndWhile
-	Actor Dummy=NPCtoSet.PlaceActorAtMe(DummyActor)
-	Dummy.Disable()
-	Dummy.setoutfit(OutfitToSet,false)
-	Utility.Wait(WaitTime)
-	InvItems = Dummy.GetInventoryItems()
-	i = 0
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i]
-		Armor ArmorItem = akItem as Armor
-		If ArmorItem != None
-			Dummy.RemoveItem(ArmorItem, 9999, true, NPCtoSet)
-			NPCtoSet.equipitem(ArmorItem)
-		EndIf
-		Weapon WeaponItem = akItem as Weapon
-		If WeaponItem != None
-			Dummy.RemoveItem(WeaponItem, 9999, true, NPCtoSet)			
-			NPCtoSet.equipitem(WeaponItem)
-		EndIf
-		i += 1
-	EndWhile
-	Dummy.Delete()
-	NPCtoSet.setposition(X,Y,Z)
-	NPCtoSet.setangle(0,0,ROT)
-	NPCtoSet.SnapIntoInteraction(furnitureRef)
+    Outfit OutfitToSet = NewOutfits.GetAt(Utility.RandomInt(0,NewOutfits.GetSize()-1)) as Outfit
+    ObjectReference furnitureRef = NPCtoSet.GetFurnitureReference()
+    NPCtoSet.setoutfit(OutfitToSet,false)
+    Form[] InvItems = NPCtoSet.GetInventoryItems()
+    Int i = 0
+    While (i < InvItems.Length)
+        Form akItem = InvItems[i]
+        If (akItem as Armor) || (akItem as Weapon)
+            NPCtoSet.unequipitem(akItem)
+            ;NPCtoSet.removeitem(akItem, 9999)
+        EndIf
+        i += 1
+    EndWhile
+    Actor Dummy=NPCtoSet.PlaceActorAtMe(DummyActor)
+    Dummy.Disable()
+    Dummy.setoutfit(OutfitToSet,false)
+    Utility.Wait(WaitTime)
+    InvItems = Dummy.GetInventoryItems()
+    i = 0
+    While (i < InvItems.Length)
+        Form akItem = InvItems[i]
+        If (akItem as Armor) || (akItem as Weapon)
+            NPCtoSet.equipitem(akItem)
+        EndIf
+        i += 1
+    EndWhile
+    Dummy.Delete()
+    If furnitureRef
+        NPCtoSet.SnapIntoInteraction(furnitureRef)
+    EndIf
 endfunction
 ;=================================================================================================================
 Function GetMCMSettings()
