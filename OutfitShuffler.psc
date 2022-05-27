@@ -7,6 +7,7 @@ Keyword Property actorTypeGhoul Auto Const
 Keyword Property AAFActorBusy Auto Const
 Formlist Property GoodOutfits Auto Const
 Formlist Property NewOutfits Auto Const
+ActorBase Property DummyActor Auto Const
 float Property ShortTime Auto
 int Property LongMult Auto
 float Property ScanRange Auto
@@ -103,28 +104,59 @@ Function SetSettlerOutfit(Actor NPC)
 	If !NPC.IsDead() && !NPC.IsDeleted() && !NPC.HasKeyword(AAFActorBusy) && !NPC.IsChild() && NPC != Game.GetPlayer() && !NPC.IsTalking() && NPC.GetLeveledActorBase().GetSex() == 1 && NPC.IsEnabled() && CheckIfFollower(NPC)
 		if Game.GetPlayer().GetDistance(NPC) < ScanRange
 			NPCSetOutfit(NPC)
-			dnotify(NPC+"Gets an outfit")
 			Return
 		endif
 	endif
 EndFunction
 ;=================================================================================================================
 Function NPCSetOutfit(Actor NPCtoSet)
-Outfit OutfitToSet = NewOutfits.GetAt(Utility.RandomInt(0,NewOutfits.GetSize()-1)) as Outfit
-NPCtoSet.GetLeveledActorBase().setoutfit(OutfitToSet,false)
-NPCtoSet.setoutfit(OutfitToSet,false)
-ObjectReference furnitureRef = NPCtoSet.GetFurnitureReference()
-float X=NPCtoSet.getpositionx()
-float Y=NPCtoSet.getpositiony()
-float Z=NPCtoSet.getpositionz()
-float ROT=NPCtoSet.getAngleZ()
-NPCtoSet.Resurrect()
-;Utility.Wait(WaitTime)
-NPCtoSet.setposition(X,Y,Z)
-NPCtoSet.setangle(0,0,ROT)
-if furnitureRef
+	Outfit OutfitToSet = NewOutfits.GetAt(Utility.RandomInt(0,NewOutfits.GetSize()-1)) as Outfit
+	ObjectReference furnitureRef = NPCtoSet.GetFurnitureReference()
+	float X=NPCtoSet.getpositionx()
+	float Y=NPCtoSet.getpositiony()
+	float Z=NPCtoSet.getpositionz()
+	float ROT=NPCtoSet.getAngleZ()
+	NPCtoSet.setoutfit(OutfitToSet,false)
+	Form[] InvItems = NPCtoSet.GetInventoryItems()
+	Int i = 0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		Armor ArmorItem = akItem as Armor
+		If ArmorItem != None
+			NPCtoSet.unequipitem(ArmorItem)
+			NPCtoSet.removeitem(ArmorItem, 9999)
+		EndIf
+		Weapon WeaponItem = akItem as Weapon
+		If WeaponItem != None
+			NPCtoSet.unequipitem(WeaponItem)
+			NPCtoSet.removeitem(WeaponItem, 9999)
+		EndIf
+		i += 1
+	EndWhile
+	Actor Dummy=NPCtoSet.PlaceActorAtMe(DummyActor)
+	Dummy.Disable()
+	Dummy.setoutfit(OutfitToSet,false)
+	Utility.Wait(WaitTime)
+	InvItems = Dummy.GetInventoryItems()
+	i = 0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		Armor ArmorItem = akItem as Armor
+		If ArmorItem != None
+			Dummy.RemoveItem(ArmorItem, 9999, true, NPCtoSet)
+			NPCtoSet.equipitem(ArmorItem)
+		EndIf
+		Weapon WeaponItem = akItem as Weapon
+		If WeaponItem != None
+			Dummy.RemoveItem(WeaponItem, 9999, true, NPCtoSet)			
+			NPCtoSet.equipitem(WeaponItem)
+		EndIf
+		i += 1
+	EndWhile
+	Dummy.Delete()
+	NPCtoSet.setposition(X,Y,Z)
+	NPCtoSet.setangle(0,0,ROT)
 	NPCtoSet.SnapIntoInteraction(furnitureRef)
-endIf	
 endfunction
 ;=================================================================================================================
 Function GetMCMSettings()
