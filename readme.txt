@@ -1,3 +1,5 @@
+20220526, a little later: Jonathan Ostrus banged in some more optimization.
+
 20220526, much much later: I got a handle on the hitching issue from using Resurrect() to refresh NPCs. The handle was, don't use Resurrect(). I got a a ton of help with some code optimization from Jonathan Ostrus over on the xEdit Discord.
 
 20220526: Removed debugging output. Now with MCM support. Huge code update. 450-ish lines, down to 142.
