@@ -1,10 +1,8 @@
+20220526, much much later: I got a handle on the hitching issue from using Resurrect() to refresh NPCs. The handle was, don't use Resurrect(). I got a a ton of help with some code optimization from Jonathan Ostrus over on the xEdit Discord.
+
 20220526: Removed debugging output. Now with MCM support. Huge code update. 450-ish lines, down to 142.
 
 STILL LOOKING FOR A WAY TO FORCE OUTFIT UPDATES WITHOUT CALLING resurrect()
-
-
-
-
 
 INITIAL COMMIT: I've been exporting outfit sets, reformatting the data, rearranging the data based on the nested leveled lists, importing the rearranged data as leveled lists of outfit items... It's a process... At this point, I could probably just rename the Leveled Lists as Body Slots, and almost be there, though...
 
