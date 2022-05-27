@@ -111,24 +111,13 @@ EndFunction
 ;=================================================================================================================
 Function NPCSetOutfit(Actor NPCtoSet)
     Outfit OutfitToSet = NewOutfits.GetAt(Utility.RandomInt(0,NewOutfits.GetSize()-1)) as Outfit
-    ObjectReference furnitureRef = NPCtoSet.GetFurnitureReference()
-    NPCtoSet.setoutfit(OutfitToSet,false)
-    Form[] InvItems = NPCtoSet.GetInventoryItems()
-    Int i = 0
-    While (i < InvItems.Length)
-        Form akItem = InvItems[i]
-        If (akItem as Armor) || (akItem as Weapon)
-            NPCtoSet.unequipitem(akItem)
-            ;NPCtoSet.removeitem(akItem, 9999)
-        EndIf
-        i += 1
-    EndWhile
     Actor Dummy=NPCtoSet.PlaceActorAtMe(DummyActor)
-    Dummy.Disable()
-    Dummy.setoutfit(OutfitToSet,false)
-    Utility.Wait(WaitTime)
-    InvItems = Dummy.GetInventoryItems()
-    i = 0
+    Dummy.DisableNoWait()
+    Dummy.SetOutfit(OutfitToSet,false)
+    Form[] InvItems = Dummy.GetInventoryItems()
+    NPCtoSet.SetOutfit(OutfitToSet,false)
+    NPCtoSet.UnequipAll()
+    int i = 0
     While (i < InvItems.Length)
         Form akItem = InvItems[i]
         If (akItem as Armor) || (akItem as Weapon)
@@ -137,9 +126,6 @@ Function NPCSetOutfit(Actor NPCtoSet)
         i += 1
     EndWhile
     Dummy.Delete()
-    If furnitureRef
-        NPCtoSet.SnapIntoInteraction(furnitureRef)
-    EndIf
 endfunction
 ;=================================================================================================================
 Function GetMCMSettings()
