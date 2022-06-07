@@ -90,7 +90,7 @@
 			"allowModifierKeys": true
 			}
 		},
-				{
+		{
 			"id": "DontChange",
 			"text": "Toggle Ignore this NPC",
 			"type": "hotkey",

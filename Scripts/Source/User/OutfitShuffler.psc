@@ -49,20 +49,20 @@ Bool modEnabled
 Bool RescanOutfits
 Bool UpdateMCM
 Bool UseAAF
-int ChanceFullBody = 10
-int ChanceShoes = 90
-int ChanceTop = 90
-int ChanceBottom = 90
-int ChanceArmAddon = 10
-int ChanceNeck = 90
-int ChanceBelt = 10
-int ChanceHair = 100
-int ChanceGlasses = 50
-int ChanceLegs = 10
-int ChanceBack = 30
-int ChanceFront = 50
-int ChanceAccessory = 10
-int ChanceWeaponsList = 100
+int ChanceFullBody
+int ChanceShoes
+int ChanceTop
+int ChanceBottom
+int ChanceArmAddon
+int ChanceNeck
+int ChanceBelt
+int ChanceHair
+int ChanceGlasses
+int ChanceLegs
+int ChanceBack
+int ChanceFront
+int ChanceAccessory
+int ChanceWeaponsList
 FormList AAF_ActiveActors
 ActorBase AAF_Doppelganger
 Outfit AAF_EmptyOutfit
@@ -111,6 +111,8 @@ Function TimerTrap()
 	endif
 	RegisterForExternalEvent("OnMCMSettingChange|OutfitShuffler", "OnMCMSettingChange")
 	If UpdateMCM
+		Debug.Notification("[OutfitShuffler] MCM Settings Changed")
+		dLog("MCM Settings Changed")
 		GetMCMSettings()
 	endif
 	bool Force = False
@@ -138,23 +140,18 @@ function ScanNPCs(bool Force=False)
 			Actor NPC = kActorArray[i] as Actor
 			if CheckEligibility(NPC)
 				if Force
-					dlog(i+"/"+kActorArray.length+":Forcing "+NPC.GetLeveledActorBase().GetName())
+					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":is being forced")
 					SetSettlerOutfit(NPC)
+					EquipItems(NPC)
 				endif
 				if !GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
-					dlog(i+"/"+kActorArray.length+":Needs an outfit "+NPC.GetLeveledActorBase().GetName())
+					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
 					SetSettlerOutfit(NPC)
 				endif
 				if GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
-					dlog(i+"/"+kActorArray.length+":"+NPC.GetLeveledActorBase().GetName()+" is wearing a good outfit")
-					Float TempVarf = MultCounter/10 as Float
-					Int TempVari = MultCounter/10 as Int
-					If TempVarf == TempVari
-						dlog(i+"/"+kActorArray.length+":"+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
-						ReEquipItems(NPC)
-					else
-						dlog(i+"/"+kActorArray.length+":"+NPC.GetLeveledActorBase().GetName()+" is waiting to refresh")
-					endIf
+					int AAL=kActorArray.length
+					dlog(i+"/"+AAL+":"+NPC.GetLeveledActorBase().GetName()+":is wearing a good outfit")
+					ReEquipItems(NPC, i, AAL)
 				endIf
 			endif
 			i += 1
@@ -174,49 +171,121 @@ Function SetSettlerOutfit(Actor NPC)
 EndFunction
 ;=================================================================================================================
 Function SetOutfitFromParts(Actor NPC)
-	If Utility.RandomInt(1,99)<ChanceFullBody
-		NPC.EquipItem(FullBody.GetAt(Utility.RandomInt(0,FullBody.GetSize())) as Armor)
+	Int Counter=0
+	If Utility.RandomInt(1,99)<ChanceFullBody && FullBody.GetSize()>0
+		Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=FullBody.GetAt(Utility.RandomInt(0,FullBody.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+		counter += 1
 	else
-		If Utility.RandomInt(1,99)<ChanceShoes
-			NPC.EquipItem(Shoes.GetAt(Utility.RandomInt(0,Shoes.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceShoes && Shoes.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Shoes.GetAt(Utility.RandomInt(0,Shoes.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceTop
-			NPC.EquipItem(Top.GetAt(Utility.RandomInt(0,Top.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceTop && Top.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Top.GetAt(Utility.RandomInt(0,Top.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceBottom
-			NPC.EquipItem(Bottom.GetAt(Utility.RandomInt(0,Bottom.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceBottom && Bottom.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Bottom.GetAt(Utility.RandomInt(0,Bottom.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceArmAddon
-			NPC.EquipItem(ArmAddon.GetAt(Utility.RandomInt(0,ArmAddon.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceArmAddon && ArmAddon.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=ArmAddon.GetAt(Utility.RandomInt(0,ArmAddon.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceNeck
-			NPC.EquipItem(Neck.GetAt(Utility.RandomInt(0,Neck.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceNeck && Neck.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Neck.GetAt(Utility.RandomInt(0,Neck.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceBelt
-			NPC.EquipItem(Belt.GetAt(Utility.RandomInt(0,Belt.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceBelt && Belt.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Belt.GetAt(Utility.RandomInt(0,Belt.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceHair
-			NPC.EquipItem(Hair.GetAt(Utility.RandomInt(0,Hair.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceHair && Hair.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Hair.GetAt(Utility.RandomInt(0,Hair.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceGlasses
-			NPC.EquipItem(Glasses.GetAt(Utility.RandomInt(0,Glasses.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceGlasses && Glasses.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Glasses.GetAt(Utility.RandomInt(0,Glasses.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceLegs
-			NPC.EquipItem(Legs.GetAt(Utility.RandomInt(0,Legs.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceLegs && Legs.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Legs.GetAt(Utility.RandomInt(0,Legs.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceBack
-			NPC.EquipItem(Back.GetAt(Utility.RandomInt(0,Back.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceBack && Back.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Back.GetAt(Utility.RandomInt(0,Back.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceFront
-			NPC.EquipItem(Front.GetAt(Utility.RandomInt(0,Front.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceFront && Front.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Front.GetAt(Utility.RandomInt(0,Front.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceAccessory
-			NPC.EquipItem(Accessory.GetAt(Utility.RandomInt(0,Accessory.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceAccessory && Accessory.GetSize()>0
+			Armor RandomArmor
+			While RandomArmor == None
+				RandomArmor=Accessory.GetAt(Utility.RandomInt(0,Accessory.GetSize())) as Armor
+			EndWhile
+			NPC.Equipitem(RandomArmor)
+			counter += 1
 		endif
-		If Utility.RandomInt(1,99)<ChanceWeaponsList
-			NPC.EquipItem(WeaponsList.GetAt(Utility.RandomInt(0,WeaponsList.GetSize())) as Armor)
+		If Utility.RandomInt(1,99)<ChanceWeaponsList && WeaponsList.GetSize()>0
+			Weapon RandomWeapon
+			While Randomweapon == None
+				RandomWeapon = WeaponsList.GetAt(Utility.RandomInt(0,WeaponsList.GetSize())) as Weapon
+			Endwhile
+			NPC.EquipItem(RandomWeapon)
+			counter += 1
 		endif
 	endif
+	dlog(NPC+" was assigned "+counter+" items")
 endfunction
 ;=================================================================================================================
 Bool Function CheckEligibility(Actor NPC)
@@ -285,12 +354,13 @@ Function EquipItems(Actor NPC)
 	EndWhile
 endfunction
 ;=================================================================================================================
-Function ReEquipItems(Actor NPC)
-	Form[] InvItems = NPC.GetInventoryItems()
+Function ReEquipItems(Actor NPC, int p, int AAL)
+	dlog(p+"/"+AAL+":"+NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
 	int i=0
+	Form[] InvItems = NPC.GetInventoryItems()
 	While (i < InvItems.Length)
 	Form akItem = InvItems[i]
-		If (akItem as Armor) && akitem.HasKeyword(OSItem)
+		If (akItem as Armor)
 			NPC.equipitem(akItem)
 			dlog(NPC+" re-equipping "+akItem.getname())
 		EndIf
@@ -329,12 +399,12 @@ Function MCMUpdate()
 endfunction
 ;=================================================================================================================
 Function OnMCMSettingChange(string modName, string id)
-	Debug.Notification("[OutfitShuffler] MCM Settings Changed")
-	dLog("MCM Settings Changed")
 	UpdateMCM = True
+	MCM.RefreshMenu()
 endFunction
 ;=================================================================================================================
 Function GetMCMSettings()
+	UpdateMCM=False
 	CancelTimer(ShortTimerID)
 	modEnabled = MCM.GetModSettingBool("OutfitShuffler", "bIsEnabled:General") as Bool
 	ScanRange = MCM.GetModSettingFloat("OutfitShuffler", "fScanRange:General") as Float

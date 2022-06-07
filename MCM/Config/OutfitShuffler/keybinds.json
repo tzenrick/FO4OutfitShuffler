@@ -6,7 +6,7 @@
       "desc": "This hotkey forces an outfit change for all NPCs.",
 	  "action": {
 			"type": "CallFunction",
-			"form": "OutfitShuffler.esp|0800",
+			"form": "OutfitShuffler.esl|0800",
 			"function": "OutfitHotkey",
 			"params": []
 	  }	
@@ -16,7 +16,7 @@
       "desc": "Toggle Outfit Changes for this NPC.",
 	  "action": {
 			"type": "CallFunction",
-			"form": "OutfitShuffler.esp|0800",
+			"form": "OutfitShuffler.esl|0800",
 			"function": "DontChange",
 			"params": []
 	  }	
