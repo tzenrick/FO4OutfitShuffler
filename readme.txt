@@ -1,3 +1,5 @@
+20220607: It's 3.0 now... Fully dynamic with config INIs and ingame outfit item chances.
+
 20220606: 3.0 Is a work in progress at this point.
 
 20220526: a little later: Jonathan Ostrus banged in some more optimization.
