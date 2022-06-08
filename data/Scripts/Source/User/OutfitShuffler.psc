@@ -441,6 +441,7 @@ Function GetMCMSettings()
 endfunction
 ;=================================================================================================================
 Function ChangeNow()
+	MCMUpdate()
 	Actor ScannedActor = LL_FourPlay.LastCrossHairActor()
 	If ScannedActor != None
 		Debug.Notification("[OutfitShuffler] "+ScannedActor.GetLeveledActorBase().GetName()+" will be changed NOW.")
@@ -452,20 +453,24 @@ Function ChangeNow()
 	endif
 endfunction
 ;=================================================================================================================
-Function OutfitHotkey() 
+Function OutfitHotkey()
+	MCMUpdate()
 	MultCounter = LongMult
 EndFunction
 ;=================================================================================================================
 Function DontChange()
+	MCMUpdate()
 	Actor ScannedActor = LL_FourPlay.LastCrossHairActor()
-	If ScannedActor.HasKeyword(DontChange)
-		ScannedActor.RemoveKeyword(DontChange)
-		debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will be changed.")
-		dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword removed, and SHOULD be changed.")
-	else
-		ScannedActor.AddKeyword(DontChange)
-		debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will NOT be changed.")
-		dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword added, and SHOULD NOT be changed.")
+	If ScannedActor != None
+		If ScannedActor.HasKeyword(DontChange)
+			ScannedActor.RemoveKeyword(DontChange)
+			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will be changed.")
+			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword removed, and SHOULD be changed.")
+		else
+			ScannedActor.AddKeyword(DontChange)
+			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will NOT be changed.")
+			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword added, and SHOULD NOT be changed.")
+		endif
 	endif
 EndFunction
 ;=================================================================================================================
@@ -527,84 +532,86 @@ Function ScanINI(String INItoCheck)
 			While l<ChildKeys.Length
 				int FormToAdd=ChildValues[l] as int
 				if FormToAdd > 0
-					dlog(LL_FourPlay.GetCustomConfigPath(INIFile)+" is adding "+Game.GetFormFromFile(FormToAdd,ChildKeys[l])+Game.GetFormFromFile(FormToAdd,ChildKeys[l]).GetName()+" to a FormList.")
-					If ChildINISections[k]=="WeaponsList"
-						WeaponsList.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Hair"
-						Hair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="LongHair"
-						LongHair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="FullBody"
-						FullBody.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Shoes"
-						Shoes.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="ArmAddon"
-						ArmAddon.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Jacket"
-						Jacket.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Top"
-						Top.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Legs"
-						Legs.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Bottom"
-						Bottom.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="TorsoArmor"
-						TorsoArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="LeftArmArmor"
-						LeftArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="RightArmArmor"
-						RightArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="LeftLegArmor"
-						LeftLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="RightLegArmor"
-						RightLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Earrings"
-						Earrings.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Glasses"
-						Glasses.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Beard"
-						Beard.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Neck"
-						Neck.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Ring"
-						Ring.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Backpack"
-						Backpack.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Belt"
-						Belt.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Shoulder"
-						Shoulder.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Back"
-						Back.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Front"
-						Front.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-					endif
-					If ChildINISections[k]=="Accessory"
-						Accessory.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+					If Game.IsPluginInstalled(ChildKeys[l])
+						dlog(LL_FourPlay.GetCustomConfigPath(INIFile)+" is adding "+Game.GetFormFromFile(FormToAdd,ChildKeys[l])+Game.GetFormFromFile(FormToAdd,ChildKeys[l]).GetName()+" to a FormList.")
+						If ChildINISections[k]=="WeaponsList"
+							WeaponsList.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Hair"
+							Hair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="LongHair"
+							LongHair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="FullBody"
+							FullBody.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Shoes"
+							Shoes.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="ArmAddon"
+							ArmAddon.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Jacket"
+							Jacket.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Top"
+							Top.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Legs"
+							Legs.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Bottom"
+							Bottom.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="TorsoArmor"
+							TorsoArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="LeftArmArmor"
+							LeftArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="RightArmArmor"
+							RightArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="LeftLegArmor"
+							LeftLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="RightLegArmor"
+							RightLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Earrings"
+							Earrings.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Glasses"
+							Glasses.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Beard"
+							Beard.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Neck"
+							Neck.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Ring"
+							Ring.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Backpack"
+							Backpack.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Belt"
+							Belt.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Shoulder"
+							Shoulder.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Back"
+							Back.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Front"
+							Front.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
+						If ChildINISections[k]=="Accessory"
+							Accessory.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+						endif
 					endif
 				endif
 			l += 1
