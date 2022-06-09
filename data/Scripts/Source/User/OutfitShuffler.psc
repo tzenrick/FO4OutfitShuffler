@@ -3,6 +3,7 @@ Scriptname OutfitShuffler extends Quest
 ;Imported Properties from ESP
 Quest Property pMQ101 Auto Const mandatory
 Outfit Property EmptyOutfit Auto Const
+Outfit Property EmptyOutfit2 Auto Const
 Formlist Property ActorRaces Auto Const
 Formlist Property GoodOutfits Auto Const
 Formlist Property NewOutfits Auto Const
@@ -164,6 +165,7 @@ Function SetSettlerOutfit(Actor NPC)
 	if CheckEligibility(NPC)
 		UnEquipItems(NPC)
 		dlog(NPC+" Setting outfit "+EmptyOutfit)
+		NPC.SetOutfit(EmptyOutfit2,false)
 		NPC.SetOutfit(EmptyOutfit,false)
 		NPC.AddKeyword(OSOutfit)
 		SetOutfitFromParts(NPC)
@@ -356,6 +358,13 @@ endfunction
 ;=================================================================================================================
 Function ReEquipItems(Actor NPC, int p, int AAL)
 	dlog(p+"/"+AAL+":"+NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
+	If NPC.GetLeveledActorBase().Getoutfit()==EmptyOutfit2
+		NPC.SetOutfit(EmptyOutfit)
+		;NPC.removeitem(Game.GetForm(0x154abe) as Armor)
+	else
+		NPC.SetOutfit(EmptyOutfit2)
+		;NPC.removeitem(Game.GetForm(0x154abd)as Armor)
+	endif
 	int i=0
 	Form[] InvItems = NPC.GetInventoryItems()
 	While (i < InvItems.Length)
