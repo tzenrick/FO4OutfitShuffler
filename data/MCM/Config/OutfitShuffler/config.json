@@ -4,7 +4,7 @@
     "minMcmVersion": 1,
     "content": [
         {
-            "text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='10'>v3.1</font>",
+            "text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>vWhatever. I can't keep up right now.</font>",
             "type": "text",
             "html": true
         },
@@ -313,6 +313,157 @@
                 "max": 100,
                 "step": 1
             }
-        }
+        },
+		{
+            "text": "Long Hair Slot",
+            "help": "Chance of Long Hair Slot (Future Use, maybe)",
+            "type": "slider",
+            "id": "iChanceLongHair:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "Jacket",
+            "help": "Chance of JacketSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceJacket:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "TorsoArmor",
+            "help": "Chance of TorsoArmorSlot (Future Use?)",
+            "type": "slider",
+            "id": "iTorsoArmorChance:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "LeftArmArmor",
+            "help": "Chance of LeftArmArmorSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceLeftArmArmor:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "RightArmArmor",
+            "help": "Chance of RightArmArmorSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceRightArmArmor:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "LeftLegArmor",
+            "help": "Chance of LeftLegArmorSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceLeftLegArmor:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "RightLegArmor",
+            "help": "Chance of RightLegArmorSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceRightLegArmor:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "Earrings",
+            "help": "Chance of EarringsSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceEarrings:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "Ring",
+            "help": "Chance of RingSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceRing:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "Backpack",
+            "help": "Chance of BackpackSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceBackpack:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "Shoulder",
+            "help": "Chance of ShoulderSlot (Future Use?)",
+            "type": "slider",
+            "id": "iChanceShoulder:General",
+            "valueOptions": {
+                "sourceType": "ModSettingInt",
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+		{
+            "text": "<br>",
+            "html": true
+        },
+		{
+            "text": "UNINSTALL! OUTFITS WILL NOT BE RESTORED!",
+            "type": "section"
+        },
+		{
+			"id": "Uninstall:Global",
+			"text": "Uninstall",
+			"type": "button",
+			"help": "This clears the formlists,and stops the OutfitShuffler Control Quest. DOES NOT RESET OUTFITS! This is your only warning. REINSTALL REQUIRED!",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "JustEndItAll"
+			}
+		}
     ]
 }

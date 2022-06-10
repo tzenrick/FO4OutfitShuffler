@@ -35,6 +35,7 @@ Formlist Property Shoulder Auto
 Formlist Property Back Auto
 Formlist Property Front Auto
 Formlist Property Accessory Auto
+FormList Property SafeItems Auto
 Keyword Property DontChange Auto Const
 Keyword Property OSOutfit Auto Const
 Keyword Property OSItem Auto Const
@@ -66,6 +67,9 @@ int ChanceFront
 int ChanceAccessory
 int ChanceWeaponsList
 int INIsToScan
+FormList[] PForm
+String[] PString
+Int[] PChance
 FormList AAF_ActiveActors
 ActorBase AAF_Doppelganger
 Outfit AAF_EmptyOutfit
@@ -74,6 +78,7 @@ Keyword AAFBusyKeyword
 ;=================================================================================================================
 ;=================================================================================================================
 Event OnInit()
+	BuildOutfitStructArray()
 	dlog("OutfitShuffler Installed")
 	debug.notification("[OutfitShuffler] Installed")
 	starttimer(ShortTime, ShortTimerID)
@@ -135,6 +140,13 @@ endFunction
 ;=================================================================================================================
 ;=================================================================================================================
 function ScanNPCs(bool Force=False)
+	Int OutfitPartsCounter
+	While OutfitPartsCounter < PForm.Length
+		If PForm[OutfitPartsCounter].GetSize() > -1 
+			dLog("============================================= "+PString[OutfitPartsCounter]+".FormList has "+PForm[OutfitPartsCounter].GetSize() +" items")
+		endif
+		OutfitPartsCounter += 1
+	endwhile
 	int racecounter = 0
 	While racecounter < ActorRaces.GetSize()
 		int i = 0
@@ -147,12 +159,14 @@ function ScanNPCs(bool Force=False)
 					Var[] params = new Var[1]
 						params[0] = NPC as Actor
 					(self as ScriptObject).CallFunctionNoWait("SetSettlerOutfit",params)
+					;SetSettlerOutfit(NPC)
 				endif
 				if !GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
 					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
 					Var[] params = new Var[1]
 						params[0] = NPC as Actor
 					(self as ScriptObject).CallFunctionNoWait("SetSettlerOutfit",params)
+					;SetSettlerOutfit(NPC)
 				endif
 				if GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
 					int AAL=kActorArray.length
@@ -162,6 +176,7 @@ function ScanNPCs(bool Force=False)
 						params[1] = i as Int
 						params[2] = AAL as Int
 						(self as ScriptObject).CallFunctionNoWait("ReEquipItems", params)
+					;ReEquipItems(NPC, i, AAL)
 				endIf
 			endif
 			i += 1
@@ -172,6 +187,7 @@ endFunction
 ;=================================================================================================================
 Function SetSettlerOutfit(Actor NPC)
 	if CheckEligibility(NPC)
+		dlog(NPC+" is being sent to UnequipItems")
 		UnEquipItems(NPC)
 		dlog(NPC+" Setting outfit "+EmptyOutfit)
 		NPC.SetOutfit(EmptyOutfit2,false)
@@ -182,121 +198,29 @@ Function SetSettlerOutfit(Actor NPC)
 EndFunction
 ;=================================================================================================================
 Function SetOutfitFromParts(Actor NPC)
-	Int Counter=0
 	If Utility.RandomInt(1,99)<ChanceFullBody && FullBody.GetSize()>0
-		Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=FullBody.GetAt(Utility.RandomInt(0,FullBody.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-		counter += 1
+		NPC.Equipitem(FullBody.GetAt(Utility.RandomInt(0,FullBody.GetSize())))
 	else
-		If Utility.RandomInt(1,99)<ChanceShoes && Shoes.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Shoes.GetAt(Utility.RandomInt(0,Shoes.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceTop && Top.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Top.GetAt(Utility.RandomInt(0,Top.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceBottom && Bottom.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Bottom.GetAt(Utility.RandomInt(0,Bottom.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceArmAddon && ArmAddon.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=ArmAddon.GetAt(Utility.RandomInt(0,ArmAddon.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceNeck && Neck.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Neck.GetAt(Utility.RandomInt(0,Neck.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceBelt && Belt.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Belt.GetAt(Utility.RandomInt(0,Belt.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceHair && Hair.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Hair.GetAt(Utility.RandomInt(0,Hair.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceGlasses && Glasses.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Glasses.GetAt(Utility.RandomInt(0,Glasses.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceLegs && Legs.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Legs.GetAt(Utility.RandomInt(0,Legs.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceBack && Back.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Back.GetAt(Utility.RandomInt(0,Back.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceFront && Front.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Front.GetAt(Utility.RandomInt(0,Front.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceAccessory && Accessory.GetSize()>0
-			Armor RandomArmor
-			While RandomArmor == None
-				RandomArmor=Accessory.GetAt(Utility.RandomInt(0,Accessory.GetSize())) as Armor
-			EndWhile
-			NPC.Equipitem(RandomArmor)
-			counter += 1
-		endif
-		If Utility.RandomInt(1,99)<ChanceWeaponsList && WeaponsList.GetSize()>0
-			Weapon RandomWeapon
-			While Randomweapon == None
-				RandomWeapon = WeaponsList.GetAt(Utility.RandomInt(0,WeaponsList.GetSize())) as Weapon
-			Endwhile
-			NPC.EquipItem(RandomWeapon)
-			counter += 1
-		endif
+		Int Counter=1
+		While counter < PForm.Length
+			If PChance[Counter]>1
+				If PForm[Counter].GetSize()>0
+					If Utility.RandomInt(1,99)<PChance[counter]
+						Form RandomItem = PForm[counter].GetAt(Utility.RandomInt(0,PForm[Counter].GetSize())) as Form
+						NPC.Equipitem(RandomItem)
+						dlog(NPC+NPC.GetLeveledActorBase().GetName()+" received "+RandomItem+" from "+PString[Counter]+".FormList")
+					else 
+						dlog(NPC+NPC.GetLeveledActorBase().GetName()+" received NO ITEM from "+PString[Counter]+".FormList")
+					endif
+				else
+					dlog(PString[counter]+".FormList has ZERO items")
+				endif
+			Else
+				dlog(PString[counter]+".FormList has ZERO chance")
+			endif
+		counter += 1
+		endwhile
 	endif
-	dlog(NPC+" was assigned "+counter+" items")
 endfunction
 ;=================================================================================================================
 Bool Function CheckEligibility(Actor NPC)
@@ -369,10 +293,8 @@ Function ReEquipItems(Actor NPC, int p, int AAL)
 	dlog(p+"/"+AAL+":"+NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
 	If NPC.GetLeveledActorBase().Getoutfit()==EmptyOutfit2
 		NPC.SetOutfit(EmptyOutfit)
-		;NPC.removeitem(Game.GetForm(0x154abe) as Armor)
 	else
 		NPC.SetOutfit(EmptyOutfit2)
-		;NPC.removeitem(Game.GetForm(0x154abd)as Armor)
 	endif
 	int i=0
 	Form[] InvItems = NPC.GetInventoryItems()
@@ -392,10 +314,14 @@ Function UnEquipItems(Actor NPC)
 	While (i < InvItems.Length)
 	Form akItem = InvItems[i]
 		dlog(NPC+" has "+akItem.getname())
-		If (akItem as Armor)
-			NPC.removeitem(akItem, -1)
-			dlog(NPC+" removing "+akItem.getname())
-		EndIf
+		If SafeItems.HasForm(akItem)
+			dlog(NPC+" NOT REMOVING "+akitem+akItem.getname()+":IS TAGGED SAFE")
+		else
+			If (akItem as Armor)
+				NPC.removeitem(akItem, -1)
+				dlog(NPC+" removing "+akitem+akItem.getname())
+			EndIf
+		endif
 	i += 1
 	EndWhile
 endfunction
@@ -430,31 +356,19 @@ Function GetMCMSettings()
 	LongMult = MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General") as Int
 	Logging = MCM.GetModSettingBool("OutfitShuffler", "bLogging:General") as Bool
 	RescanOutfits = MCM.GetModSettingBool("OutfitShuffler", "bRescanOutfits:General") as Bool
-;OutfitChances
-	ChanceFullBody = MCM.GetModSettingInt("OutfitShuffler", "iChanceFullBody:General") as Int
-	ChanceShoes = MCM.GetModSettingInt("OutfitShuffler", "iChanceShoes:General") as Int
-	ChanceTop = MCM.GetModSettingInt("OutfitShuffler", "iChanceTop:General") as Int
-	ChanceBottom = MCM.GetModSettingInt("OutfitShuffler", "iChanceBottom:General") as Int
-	ChanceArmAddon = MCM.GetModSettingInt("OutfitShuffler", "iChanceArmAddon:General") as Int
-	ChanceNeck = MCM.GetModSettingInt("OutfitShuffler", "iChanceNeck:General") as Int
-	ChanceBelt = MCM.GetModSettingInt("OutfitShuffler", "iChanceBelt:General") as Int
-	ChanceHair = MCM.GetModSettingInt("OutfitShuffler", "iChanceHair:General") as Int
-	ChanceGlasses = MCM.GetModSettingInt("OutfitShuffler", "iChanceGlasses:General") as Int
-	ChanceLegs = MCM.GetModSettingInt("OutfitShuffler", "iChanceLegs:General") as Int
-	ChanceBack = MCM.GetModSettingInt("OutfitShuffler", "iChanceBack:General") as Int
-	ChanceFront = MCM.GetModSettingInt("OutfitShuffler", "iChanceFront:General") as Int
-	ChanceAccessory = MCM.GetModSettingInt("OutfitShuffler", "iChanceAccessory:General") as Int
-	ChanceWeaponsList = MCM.GetModSettingInt("OutfitShuffler", "iChanceWeaponsList:General") as Int
-;Logging
-	dlog("MCMRaw.bIsEnabled:General="+MCM.GetModSettingBool("OutfitShuffler", "bIsEnabled:General"))
 	dlog("GetMCMSettings:IsEnabled="+modEnabled)
 	dlog("GetMCMSettings:ScanRange="+ScanRange)
 	dlog("GetMCMSettings:Logging="+Logging)
 	dlog("GetMCMSettings:ShortTime="+ShortTime)
 	dlog("GetMCMSettings:LongMult="+LongMult)
 	dlog("GetMCMSettings:RescanOutfits="+RescanOutfits)
-	dlog("MCMRaw.iChanceFullBody:General="+MCM.GetModSettingInt("OutfitShuffler", "iChanceFullBody:General"))
-	dlog("ChanceFullBody="+ChanceFullBody + "  ChanceShoes="+ChanceShoes + "  ChanceTop="+ChanceTop + "  ChanceBottom="+ChanceBottom + "  ChanceArmAddon="+ChanceArmAddon + "  ChanceNeck="+ChanceNeck + "  ChanceBelt="+ChanceBelt + "  ChanceHair="+ChanceHair + "  ChanceGlasses="+ChanceGlasses + "  ChanceLegs="+ChanceLegs + "  ChanceBack="+ChanceBack + "  ChanceFront="+ChanceFront + "  ChanceAccessory="+ChanceAccessory + "  ChanceWeaponsList="+ChanceWeaponsList)
+;OutfitChances
+	Int counter = 0
+	While counter < PForm.Length
+		PChance[counter]=MCM.GetModSettingInt("OutfitShuffler", "iChance"+PString[counter]+":General") as Int
+		dlog("MCMGetModSetting(iChance"+PString[counter]+")="+PChance[counter])
+		counter += 1
+	endwhile
 	MCMUpdate()
 endfunction
 ;=================================================================================================================
@@ -503,31 +417,13 @@ endFunction
 ;=================================================================================================================
 ;=================================================================================================================
 Function RescanOutfitsINI()
-	WeaponsList.Revert()
-	FullBody.Revert()
-	Shoes.Revert()
-	Top.Revert()
-	Bottom.Revert()
-	ArmAddon.Revert()
-	Neck.Revert()
-	Belt.Revert()
-	Hair.Revert()
-	LongHair.Revert()
-	Glasses.Revert()
-	Legs.Revert()
-	Back.Revert()
-	Front.Revert()
-	Accessory.Revert()
-	Jacket.Revert()
-	TorsoArmor.Revert()
-	LeftArmArmor.Revert()
-	RightArmArmor.Revert()
-	LeftLegArmor.Revert()
-	RightLegArmor.Revert()
-	Earrings.Revert()
-	Ring.Revert()
-	Backpack.Revert()
-	Shoulder.Revert()
+	int AllSlotsCounter = 0
+	int counter=0
+	While counter < PForm.Length
+		dlog("Reverting =>"+PString[Counter]+"<==  "+PForm[counter]+" Chance="+PChance[counter]+" Count="+PForm[counter].GetSize())
+		PForm[counter].revert()
+		counter += 1
+	endwhile
 	
 	Debug.Notification("[OutfitShuffler] _-_-_-_-_-_-_-_-_-_-_-_-_- Stopping timers and rescanning outfit pieces _-_-_-_-_-_-_-_-_-_-_-_-_-")
 	CancelTimer(ShortTimerID)
@@ -559,6 +455,10 @@ Function RescanOutfitsINI()
 	Endwhile
 	dlog("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-INIsToScan "+INIsToScan+"/"+INILoads+"INILoads  _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
 	IterateLists()
+	Debug.Notification("[OutfitShuffler] Rescanning NPCs after update")
+	dlog("Rescanning NPCs after update")
+	GetMCMSettings()
+	ScanNPCs(True)
 	StartTimer(ShortTime, ShortTimerID)
 endfunction
 ;=================================================================================================================
@@ -566,103 +466,29 @@ Function ScanINI(String INItoCheck)
 	String INIpath = "OutfitShuffler\\" 
 	String INIFile=INIpath+INItoCheck
 	String[] ChildINISections=LL_FourPlay.GetCustomConfigSections(INIFile) as String[]
-	int k=0
-	if ChildINISections.Length != 0
-		While k<ChildINISections.Length
-			Var[] ChildConfigOptions=LL_FourPlay.GetCustomConfigOptions(INIFile, ChildINISections[k])
+	int ChildINISectionCounter=0
+	if ChildINISections.Length > 0
+		While ChildINISectionCounter<ChildINISections.Length
+			Var[] ChildConfigOptions=LL_FourPlay.GetCustomConfigOptions(INIFile, ChildINISections[ChildINISectionCounter])
 			Var[] ChildKeys=Utility.VarToVarArray(ChildConfigOptions[0])
 			Var[] ChildValues=Utility.VarToVarArray(ChildConfigOptions[1])
-			int l=0
-			While l<ChildKeys.Length
-				int FormToAdd=ChildValues[l] as int
-				if FormToAdd > 0
-					If Game.IsPluginInstalled(ChildKeys[l])
-						dlog(LL_FourPlay.GetCustomConfigPath(INIFile)+" is adding "+Game.GetFormFromFile(FormToAdd,ChildKeys[l])+Game.GetFormFromFile(FormToAdd,ChildKeys[l]).GetName()+" to a FormList.")
-						If ChildINISections[k]=="WeaponsList"
-							WeaponsList.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
+			If ChildKeys.Length > 0
+				int ChildKeysCounter=0
+				While ChildKeysCounter < ChildKeys.Length
+					int FormToAdd=ChildValues[ChildKeysCounter] as int
+					If Game.IsPluginInstalled(ChildKeys[ChildKeysCounter])
+						if FormToAdd > 0
+							int OutfitPartsCounter = 0
+							If PString.Find(ChildINISections[ChildINISectionCounter]) > -1
+								PForm[PString.Find(ChildINISections[ChildINISectionCounter])].AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter]))
+								dlog(INItoCheck+" added "+Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter]).GetName()+" from "+ChildKeys[ChildKeysCounter]+" to "+PString[PString.Find(ChildINISections[ChildINISectionCounter])]+PForm[PString.Find(ChildINISections[ChildINISectionCounter])])
+							endIf
 						endif
-						If ChildINISections[k]=="Hair"
-							Hair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="LongHair"
-							LongHair.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="FullBody"
-							FullBody.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Shoes"
-							Shoes.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="ArmAddon"
-							ArmAddon.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Jacket"
-							Jacket.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Top"
-							Top.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Legs"
-							Legs.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Bottom"
-							Bottom.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="TorsoArmor"
-							TorsoArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="LeftArmArmor"
-							LeftArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="RightArmArmor"
-							RightArmArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="LeftLegArmor"
-							LeftLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="RightLegArmor"
-							RightLegArmor.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Earrings"
-							Earrings.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Glasses"
-							Glasses.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Beard"
-							Beard.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Neck"
-							Neck.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Ring"
-							Ring.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Backpack"
-							Backpack.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Belt"
-							Belt.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Shoulder"
-							Shoulder.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Back"
-							Back.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Front"
-							Front.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-						If ChildINISections[k]=="Accessory"
-							Accessory.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
-						endif
-					else
-						dlog(LL_FourPlay.GetCustomConfigPath(INIFile)+" ======================   NOT LOADED or INSTALLED.")
 					endif
-				endif
-			l += 1
-			endwhile
-		k += 1
+				ChildKeysCounter += 1
+				endwhile
+			endif
+		ChildINISectionCounter += 1
 		endwhile
 	else
 		dlog(INIFile+" does not contain any sections")
@@ -671,194 +497,136 @@ Function ScanINI(String INItoCheck)
 endFunction
 ;=================================================================================================================
 Function IterateLists()
-	If Logging
-		Debug.Notification("[OutfitShuffler] Dumping Formlists to Log")
-		dLog("====================Iterating Formlists==================")
-		int IntCounter = 0
-		dLog("=============================================WeaponsList")
-		While IntCounter<WeaponsList.GetSize()
-			dLog(WeaponsList.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Hair")
-		While IntCounter<Hair.GetSize()
-			dLog(Hair.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================LongHair")
-		IntCounter=0
-		While IntCounter<LongHair.GetSize()
-			dLog(LongHair.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================FullBody")
-		IntCounter=0
-		While IntCounter<FullBody.GetSize()
-			dLog(FullBody.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Shoes")
-		IntCounter=0
-		While IntCounter<Shoes.GetSize()
-			dLog(Shoes.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================ArmAddon")
-		IntCounter=0
-		While IntCounter<ArmAddon.GetSize()
-			dLog(ArmAddon.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Jacket")
-		IntCounter=0
-		While IntCounter<Jacket.GetSize()
-			dLog(Jacket.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Top")
-		IntCounter=0
-		While IntCounter<Top.GetSize()
-			dLog(Top.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Legs")
-		IntCounter=0
-		While IntCounter<Legs.GetSize()
-			dLog(Legs.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Bottom")
-		IntCounter=0
-		While IntCounter<Bottom.GetSize()
-			dLog(Bottom.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================TorsoArmor")
-		IntCounter=0
-		While IntCounter<TorsoArmor.GetSize()
-			dLog(TorsoArmor.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================LeftArmArmor")
-		IntCounter=0
-		While IntCounter<LeftArmArmor.GetSize()
-			dLog(LeftArmArmor.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================RightArmArmor")
-		IntCounter=0
-		While IntCounter<RightArmArmor.GetSize()
-			dLog(RightArmArmor.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================LeftLegArmor")
-		IntCounter=0
-		While IntCounter<LeftLegArmor.GetSize()
-			dLog(LeftLegArmor.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================RightLegArmor")
-		IntCounter=0
-		While IntCounter<RightLegArmor.GetSize()
-			dLog(RightLegArmor.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Earrings")
-		IntCounter=0
-		While IntCounter<Earrings.GetSize()
-			dLog(Earrings.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Glasses")
-		IntCounter=0
-		While IntCounter<Glasses.GetSize()
-			dLog(Glasses.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Beard")
-		IntCounter=0
-		While IntCounter<Beard.GetSize()
-			dLog(Beard.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Neck")
-		IntCounter=0
-		While IntCounter<Neck.GetSize()
-			dLog(Neck.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Ring")
-		IntCounter=0
-		While IntCounter<Ring.GetSize()
-			dLog(Ring.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Backpack")
-		IntCounter=0
-		While IntCounter<Backpack.GetSize()
-			dLog(Backpack.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Belt")
-		IntCounter=0
-		While IntCounter<Belt.GetSize()
-			dLog(Belt.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Shoulder")
-		IntCounter=0
-		While IntCounter<Shoulder.GetSize()
-			dLog(Shoulder.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Back")
-		IntCounter=0
-		While IntCounter<Back.GetSize()
-			dLog(Back.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Front")
-		IntCounter=0
-		While IntCounter<Front.GetSize()
-			dLog(Front.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		dLog("=============================================Accessory")
-		IntCounter=0
-		While IntCounter<Accessory.GetSize()
-			dLog(Accessory.GetAt(IntCounter).GetName())
-		IntCounter += 1
-		EndWhile
-		Debug.Notification("[OutfitShuffler] Finished dumping formlists to log")
-	endif
+	Debug.Notification("[OutfitShuffler] Dumping Formlists to Log")
+	dLog("====================Iterating Formlists==================")
+		int OutfitPartsCounter=0
+		While OutfitPartsCounter < PForm.Length
+			int IntOutfitPartsCounter = 0
+			dLog("============================================= "+PString[OutfitPartsCounter])
+			While IntOutfitPartsCounter < PForm[OutfitPartsCounter].GetSize()
+				dLog(PForm[OutfitPartsCounter].GetAt(IntOutfitPartsCounter).GetName())
+				IntOutfitPartsCounter += 1
+			EndWhile
+			OutfitPartsCounter += 1
+		endwhile
+	Debug.Notification("[OutfitShuffler] Finished dumping formlists to log")
 EndFunction
 
 Function JustEndItAll()
-	WeaponsList.Revert()
-	FullBody.Revert()
-	Shoes.Revert()
-	Top.Revert()
-	Bottom.Revert()
-	ArmAddon.Revert()
-	Neck.Revert()
-	Belt.Revert()
-	Hair.Revert()
-	LongHair.Revert()
-	Glasses.Revert()
-	Legs.Revert()
-	Back.Revert()
-	Front.Revert()
-	Accessory.Revert()
-	Jacket.Revert()
-	TorsoArmor.Revert()
-	LeftArmArmor.Revert()
-	RightArmArmor.Revert()
-	LeftLegArmor.Revert()
-	RightLegArmor.Revert()
-	Earrings.Revert()
-	Ring.Revert()
-	Backpack.Revert()
-	Shoulder.Revert()
+	int counter=0
+	While counter < PForm.Length
+		PForm[counter].revert()
+		counter += 1
+	endwhile
 	debug.messagebox("This is irreversible, and you were warned. Save, reload, save, exit. Reinstall or upgrade.")
 	OutfitShufflerQuest.Stop()
 endFunction
+
+Function BuildOutfitStructArray()
+	PForm = new FormList[0]
+	PString = new String[0]
+	PChance = new Int[0]
+	PString.Add("FullBody")
+	PForm.Add(FullBody)
+	PChance.Add(0)
+	;0
+	PString.Add("Shoes")
+	PForm.Add(Shoes)
+	PChance.Add(0)
+	;1
+	PString.Add("Top")
+	PForm.Add(Top)
+	PChance.Add(0)
+	;2
+	PString.Add("Bottom")
+	PForm.Add(Bottom)
+	PChance.Add(0)
+	;3
+	PString.Add("ArmAddon")
+	PForm.Add(ArmAddon)
+	PChance.Add(0)
+	;4
+	PString.Add("Neck")
+	PForm.Add(Neck)
+	PChance.Add(0)
+	;5
+	PString.Add("Belt")
+	PForm.Add(Belt)
+	PChance.Add(0)
+	;6
+	PString.Add("Hair")
+	PForm.Add(Hair)
+	PChance.Add(0)
+	;7
+	PString.Add("LongHair")
+	PForm.Add(LongHair)
+	PChance.Add(0)
+	;8
+	PString.Add("Glasses")
+	PForm.Add(Glasses)
+	PChance.Add(0)
+	;9
+	PString.Add("Legs")
+	PForm.Add(Legs)
+	PChance.Add(0)
+	;10
+	PString.Add("Back")
+	PForm.Add(Back)
+	PChance.Add(0)
+	;11
+	PString.Add("Front")
+	PForm.Add(Front)
+	PChance.Add(0)
+	;12
+	PString.Add("Accessory")
+	PForm.Add(Accessory)
+	PChance.Add(0)
+	;13
+	PString.Add("Jacket")
+	PForm.Add(Jacket)
+	PChance.Add(0)
+	;14
+	PString.Add("TorsoArmor")
+	PForm.Add(TorsoArmor)
+	PChance.Add(0)
+	;15
+	PString.Add("LeftArmArmor")
+	PForm.Add(LeftArmArmor)
+	PChance.Add(0)
+	;16
+	PString.Add("RightArmArmor")
+	PForm.Add(RightArmArmor)
+	PChance.Add(0)
+	;17
+	PString.Add("LeftLegArmor")
+	PForm.Add(LeftLegArmor)
+	PChance.Add(0)
+	;18
+	PString.Add("RightLegArmor")
+	PForm.Add(RightLegArmor)
+	PChance.Add(0)
+	;19
+	PString.Add("Earrings")
+	PForm.Add(Earrings)
+	PChance.Add(0)
+	;20
+	PString.Add("Ring")
+	PForm.Add(Ring)
+	PChance.Add(0)
+	;21
+	PString.Add("Backpack")
+	PForm.Add(Backpack)
+	PChance.Add(0)
+	;22
+	PString.Add("Shoulder")
+	PForm.Add(Shoulder)
+	PChance.Add(0)
+	;23
+	PString.Add("WeaponsList")
+	PForm.Add(WeaponsList)
+	PChance.Add(0)
+	;24
+	PString.Add("SafeItems")
+	PForm.Add(SafeItems)
+	PChance.Add(0)
+endfunction
