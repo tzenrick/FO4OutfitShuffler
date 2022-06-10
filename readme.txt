@@ -1,3 +1,5 @@
+20220609: I'm updating code faster than the readme. Trying to parallelize, and still getting serial execution.
+
 20220607: It's 3.0 now... Fully dynamic with config INIs and ingame outfit item chances.
 
 20220606: 3.0 Is a work in progress at this point.
