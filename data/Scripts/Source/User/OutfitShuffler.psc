@@ -1,6 +1,7 @@
 Scriptname OutfitShuffler extends Quest
 ;=================================================================================================================
 ;Imported Properties from ESP
+Quest Property OutfitShufflerQuest Auto Const
 Quest Property pMQ101 Auto Const mandatory
 Outfit Property EmptyOutfit Auto Const
 Outfit Property EmptyOutfit2 Auto Const
@@ -64,6 +65,7 @@ int ChanceBack
 int ChanceFront
 int ChanceAccessory
 int ChanceWeaponsList
+int INIsToScan
 FormList AAF_ActiveActors
 ActorBase AAF_Doppelganger
 Outfit AAF_EmptyOutfit
@@ -142,17 +144,24 @@ function ScanNPCs(bool Force=False)
 			if CheckEligibility(NPC)
 				if Force
 					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":is being forced")
-					SetSettlerOutfit(NPC)
-					EquipItems(NPC)
+					Var[] params = new Var[1]
+						params[0] = NPC as Actor
+					(self as ScriptObject).CallFunctionNoWait("SetSettlerOutfit",params)
 				endif
 				if !GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
 					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
-					SetSettlerOutfit(NPC)
+					Var[] params = new Var[1]
+						params[0] = NPC as Actor
+					(self as ScriptObject).CallFunctionNoWait("SetSettlerOutfit",params)
 				endif
 				if GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
 					int AAL=kActorArray.length
 					dlog(i+"/"+AAL+":"+NPC.GetLeveledActorBase().GetName()+":is wearing a good outfit")
-					ReEquipItems(NPC, i, AAL)
+					Var[] params = new Var[3]
+						params[0] = NPC as Actor
+						params[1] = i as Int
+						params[2] = AAL as Int
+						(self as ScriptObject).CallFunctionNoWait("ReEquipItems", params)
 				endIf
 			endif
 			i += 1
@@ -494,35 +503,61 @@ endFunction
 ;=================================================================================================================
 ;=================================================================================================================
 Function RescanOutfitsINI()
-	Debug.Notification("[OutfitShuffler] Stopping timers and rescanning outfit pieces")
+	WeaponsList.Revert()
+	FullBody.Revert()
+	Shoes.Revert()
+	Top.Revert()
+	Bottom.Revert()
+	ArmAddon.Revert()
+	Neck.Revert()
+	Belt.Revert()
+	Hair.Revert()
+	LongHair.Revert()
+	Glasses.Revert()
+	Legs.Revert()
+	Back.Revert()
+	Front.Revert()
+	Accessory.Revert()
+	Jacket.Revert()
+	TorsoArmor.Revert()
+	LeftArmArmor.Revert()
+	RightArmArmor.Revert()
+	LeftLegArmor.Revert()
+	RightLegArmor.Revert()
+	Earrings.Revert()
+	Ring.Revert()
+	Backpack.Revert()
+	Shoulder.Revert()
+	
+	Debug.Notification("[OutfitShuffler] _-_-_-_-_-_-_-_-_-_-_-_-_- Stopping timers and rescanning outfit pieces _-_-_-_-_-_-_-_-_-_-_-_-_-")
 	CancelTimer(ShortTimerID)
 	String MasterINI = "OutfitShuffler.ini"
-	String[] INILoads = new String[0]
+	Int INILoads
 	String[] INISections=LL_FourPlay.GetCustomConfigSections(MasterINI) as String[]
 	int i=0
+	INIsToScan=0
 	While i<INISections.Length
 		Var[] ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, INISections[i])
 		Var[] Keys=Utility.VarToVarArray(ConfigOptions[0])
 		int j=0
-		int INICounter=0
 		While j<Keys.Length
 			int ConfigOptionsInt=LL_FourPlay.GetCustomConfigOption_UInt32(MasterINI, INISections[i], Keys[j]) as int
 			if ConfigOptionsInt > 0
-				INILoads.Add(Keys[j] as String)
-				dlog(LL_FourPlay.GetCustomConfigPath(MasterINI)+" added "+Keys[j]+" to INILoads array.")
-				INICounter += 1
+				dlog("_-_-_-_-_-_-_-_-_-_-_-_-_- "+LL_FourPlay.GetCustomConfigPath(MasterINI)+" sent "+Keys[j]+" to ScanINI() _-_-_-_-_-_-_-_-_-_-_-_-_-")
+				Var[] params = new Var[1]
+					params[0] = Keys[j] as String
+				(self as ScriptObject).CallFunctionNoWait("ScanINI",params)
+				INILoads += 1
 			endif
 		j += 1
 		endwhile
 	i += 1
 	endwhile
-	i=0
-	While i<INILoads.Length
-		Debug.Notification("[OutfitShuffler] Adding "+iniloads[i]+" to Formlists.")
-		dlog("Passing "+iniloads[i]+" to ScanINI")
-		ScanINI(INILoads[i])
-	i += 1
-	endwhile
+	While INIsToScan < INILoads
+		dlog("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-INIsToScan "+INIsToScan+"/"+INILoads+"INILoads  _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
+		Utility.Wait(0.2)
+	Endwhile
+	dlog("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-INIsToScan "+INIsToScan+"/"+INILoads+"INILoads  _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-")
 	IterateLists()
 	StartTimer(ShortTime, ShortTimerID)
 endfunction
@@ -621,6 +656,8 @@ Function ScanINI(String INItoCheck)
 						If ChildINISections[k]=="Accessory"
 							Accessory.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[l]))
 						endif
+					else
+						dlog(LL_FourPlay.GetCustomConfigPath(INIFile)+" ======================   NOT LOADED or INSTALLED.")
 					endif
 				endif
 			l += 1
@@ -630,6 +667,7 @@ Function ScanINI(String INItoCheck)
 	else
 		dlog(INIFile+" does not contain any sections")
 	endif
+	INIsToScan += 1
 endFunction
 ;=================================================================================================================
 Function IterateLists()
@@ -794,3 +832,33 @@ Function IterateLists()
 		Debug.Notification("[OutfitShuffler] Finished dumping formlists to log")
 	endif
 EndFunction
+
+Function JustEndItAll()
+	WeaponsList.Revert()
+	FullBody.Revert()
+	Shoes.Revert()
+	Top.Revert()
+	Bottom.Revert()
+	ArmAddon.Revert()
+	Neck.Revert()
+	Belt.Revert()
+	Hair.Revert()
+	LongHair.Revert()
+	Glasses.Revert()
+	Legs.Revert()
+	Back.Revert()
+	Front.Revert()
+	Accessory.Revert()
+	Jacket.Revert()
+	TorsoArmor.Revert()
+	LeftArmArmor.Revert()
+	RightArmArmor.Revert()
+	LeftLegArmor.Revert()
+	RightLegArmor.Revert()
+	Earrings.Revert()
+	Ring.Revert()
+	Backpack.Revert()
+	Shoulder.Revert()
+	debug.messagebox("This is irreversible, and you were warned. Save, reload, save, exit. Reinstall or upgrade.")
+	OutfitShufflerQuest.Stop()
+endFunction
