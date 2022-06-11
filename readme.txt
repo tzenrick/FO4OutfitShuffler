@@ -1,3 +1,5 @@
+20220611: Stopped doing most of the static string comparisons for a lot of things, built an array, now I can iterate the array for the string comparisions. Got code from 30K to 23K, so that's not insignificant.
+
 20220609: I'm updating code faster than the readme. Trying to parallelize, and still getting serial execution.
 
 20220607: It's 3.0 now... Fully dynamic with config INIs and ingame outfit item chances.
