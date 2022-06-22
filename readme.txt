@@ -1,3 +1,16 @@
+20220611:  4.4 Added a couple of sanity checks, tweaked a couple of things so that any race from any mod should be able to be added, as long as they can wear human clothes, and any faction from any mod can be excluded.
+
+4.3 Factions can be ignored by specifying them in the OutfitShuffler.ini file.
+
+https://i.ibb.co/y5NDBP6/image.png
+(This is how everything in the INI files is specified. File.esm=DecimalConversionofFormID)
+
+4.2 Moved Race selection from esl to OutfitShuffler.ini. This is a "If you don't need it, don't bother" type feature update.
+
+4.1 has a couple of significant bugfixes over 4.0.
+It's kinda(in my opinion, anyway) worth it.
+
+
 20220611: Stopped doing most of the static string comparisons for a lot of things, built an array, now I can iterate the array for the string comparisions. Got code from 30K to 23K, so that's not insignificant.
 
 20220609: I'm updating code faster than the readme. Trying to parallelize, and still getting serial execution.
