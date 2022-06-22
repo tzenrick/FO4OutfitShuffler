@@ -1,86 +1,95 @@
 {
-    "modName": "OutfitShuffler",
-    "displayName": "Outfit Shuffler",
-    "minMcmVersion": 1,
-    "content": [
-        {
-            "text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>vWhatever. I can't keep up right now.</font>",
-            "type": "text",
-            "html": true
-        },
-        {
-            "text": "General Settings",
-            "type": "section"
-        },
-        {
-            "text": "Enable Outfit Shuffling",
-            "help": "Enable or disable this mod. Default: OFF",
-            "type": "switcher",
-            "id": "bIsEnabled:General",
-            "valueOptions": {
-                "sourceType": "ModSettingBool"
-            }
-        },
+	"modName": "OutfitShuffler",
+	"displayName": "Outfit Shuffler",
+	"minMcmVersion": 1,
+	"content": [
 		{
-            "text": "<br>",
-            "html": true
-        },
-        {
-            "text": "<br>",
-            "html": true
-        },
-        {
-            "text": "Scanning",
-            "type": "section"
-        },
+			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>vWhatever. I can't keep up right now.</font>",
+			"type": "text",
+			"html": true
+		},
 		{
-            "text": "Scanning Distance",
-            "help": "How many units away to scan.",
-            "type": "slider",
-            "id": "fScanRange:General",
-            "valueOptions": {
-                "sourceType": "ModSettingFloat",
-                "min": 500.0,
-                "max": 15000.0,
-                "step": 100.0
-            }
-        },
-		        {
-            "text": "Timers and Counters",
-            "type": "section"
-        },
+			"text": "General Settings",
+			"type": "section"
+		},
 		{
-            "text": "Short Timer",
-            "help": "Puts new people in the scan range into new outfits.",
-            "type": "slider",
-            "id": "fShortTime:General",
-            "valueOptions": {
-                "sourceType": "ModSettingFloat",
-                "min": 1.0,
-                "max": 600.0,
-                "step": 1.0
-            }
-        },
+			"text": "Enable Outfit Shuffling",
+			"help": "Enable or disable this mod.",
+			"type": "switcher",
+			"id": "bIsEnabled:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
 		{
-            "text": "Multiplier",
-            "help": "How many times to run the short timer before changing EVEYONE'S outfits, regardless of what they are wearing.",
-            "type": "slider",
-            "id": "iLongMult:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 5,
-                "max": 1111,
-                "step": 1
-            }
-        },
+			"text": "<br>",
+			"html": true
+		},
 		{
-            "text": "<br>",
-            "html": true
-        },
+			"text": "Dress the Dead",
+			"help": "Put outfits on dead bodies.",
+			"type": "switcher",
+			"id": "bDressTheDead:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
 		{
-            "text": "Hotkeys",
-            "type": "section"
-        },
+			"text": "<br>",
+			"html": true
+		},
+		{
+			"text": "Scanning",
+			"type": "section"
+		},
+		{
+			"text": "Scanning Distance",
+			"help": "How many units away to scan.",
+			"type": "slider",
+			"id": "fScanRange:General",
+			"valueOptions": {
+				"sourceType": "ModSettingFloat",
+				"min": 500.0,
+				"max": 15000.0,
+				"step": 100.0
+			}
+		},
+				{
+			"text": "Timers and Counters",
+			"type": "section"
+		},
+		{
+			"text": "Short Timer",
+			"help": "Puts new people in the scan range into new outfits.",
+			"type": "slider",
+			"id": "fShortTime:General",
+			"valueOptions": {
+				"sourceType": "ModSettingFloat",
+				"min": 1.0,
+				"max": 600.0,
+				"step": 1.0
+			}
+		},
+		{
+			"text": "Multiplier",
+			"help": "How many times to run the short timer before changing EVEYONE'S outfits, regardless of what they are wearing.",
+			"type": "slider",
+			"id": "iLongMult:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 5,
+				"max": 1111,
+				"step": 1
+			}
+		},
+		{
+			"text": "<br>",
+			"html": true
+		},
+		{
+			"text": "Hotkeys",
+			"type": "section"
+		},
 		{
 			"id": "ChangeNow",
 			"text": "Changes the outfit on the targeted NPC as soon as possible.",
@@ -109,351 +118,353 @@
 			}
 		},
 		{
-            "text": "<br>",
-            "html": true
-        },
+			"text": "<br>",
+			"html": true
+		},
 		{
-            "text": "Logging",
-            "type": "section"
-        },
-        {
-            "text": "Log to Papyrus",
-            "help": "Output debugging to Papyrus log. Default: OFF",
-            "type": "switcher",
-            "id": "bLogging:General",
-            "valueOptions": {
-                "sourceType": "ModSettingBool"
-            }
-        },
+			"text": "Logging",
+			"type": "section"
+		},
 		{
-            "text": "Rescan",
-            "type": "section"
-        },
+			"text": "Log to Papyrus",
+			"help": "Output debugging to Papyrus log. Default: OFF",
+			"type": "switcher",
+			"id": "bLogging:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
 		{
-            "text": "Rescan outfits",
-            "help": "Rescan all outfits configs from disk. Close menu after toggling to update.",
-            "type": "switcher",
-            "id": "bRescanOutfits:General",
-            "valueOptions": {
-                "sourceType": "ModSettingBool"
-            }
-        },
+			"text": "Rescan",
+			"type": "section"
+		},
 		{
-            "text": "<br>",
-            "html": true
-        },
+			"id": "Rescan:Global",
+			"text": "Rescan Outfits",
+			"type": "button",
+			"help": "Rescan all outfits configs from disk. Close menu after toggling to update.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "RescanOutfitsINI"
+			}
+		},
 		{
-            "text": "Chances of parts",
-            "type": "section"
-        },
+			"text": "<br>",
+			"html": true
+		},
 		{
-            "text": "Full Body",
-            "help": "Chance of Full Body Suit instead of building from Parts.",
-            "type": "slider",
-            "id": "iChanceFullBody:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Chances of parts",
+			"type": "section"
+		},
 		{
-            "text": "Shoes",
-            "help": "Chance of shoes and boots.",
-            "type": "slider",
-            "id": "iChanceShoes:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Full Body",
+			"help": "Chance of Full Body Suit instead of building from Parts.",
+			"type": "slider",
+			"id": "iChanceFullBody:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Top",
-            "help": "Chance of getting a top.",
-            "type": "slider",
-            "id": "iChanceTop:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Shoes",
+			"help": "Chance of shoes and boots.",
+			"type": "slider",
+			"id": "iChanceShoes:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Bottom",
-            "help": "Chance of Bottoms.",
-            "type": "slider",
-            "id": "iChanceBottom:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Top",
+			"help": "Chance of getting a top.",
+			"type": "slider",
+			"id": "iChanceTop:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Arm Addons",
-            "help": "Chance of Arm Addons, like bracelets, sleeve objects, or wraps.",
-            "type": "slider",
-            "id": "iChanceArmAddon:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Bottom",
+			"help": "Chance of Bottoms.",
+			"type": "slider",
+			"id": "iChanceBottom:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Neck Items",
-            "help": "Chance of Necklaces, scarves, chokers, etc.",
-            "type": "slider",
-            "id": "iChanceNeck:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Arm Addons",
+			"help": "Chance of Arm Addons, like bracelets, sleeve objects, or wraps.",
+			"type": "slider",
+			"id": "iChanceArmAddon:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Belts",
-            "help": "Chance of Belts.",
-            "type": "slider",
-            "id": "iChanceBelt:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Neck Items",
+			"help": "Chance of Necklaces, scarves, chokers, etc.",
+			"type": "slider",
+			"id": "iChanceNeck:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Wigs or Hats",
-            "help": "Chance of Wigs or Hats.",
-            "type": "slider",
-            "id": "iChanceHair:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Belts",
+			"help": "Chance of Belts.",
+			"type": "slider",
+			"id": "iChanceBelt:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Glasses",
-            "help": "Chance of Glasses/Sunglasses.",
-            "type": "slider",
-            "id": "iChanceGlasses:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Wigs or Hats",
+			"help": "Chance of Wigs or Hats.",
+			"type": "slider",
+			"id": "iChanceHair:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Legs",
-            "help": "Chance of Leg Wraps, Stocking, or Socks.",
-            "type": "slider",
-            "id": "iChanceLegs:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Glasses",
+			"help": "Chance of Glasses/Sunglasses.",
+			"type": "slider",
+			"id": "iChanceGlasses:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Back Accessories",
-            "help": "Chance of Back Accessories.",
-            "type": "slider",
-            "id": "iChanceBack:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Legs",
+			"help": "Chance of Leg Wraps, Stocking, or Socks.",
+			"type": "slider",
+			"id": "iChanceLegs:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Front Accessories",
-            "help": "Chance of Front Accessories.",
-            "type": "slider",
-            "id": "iChanceFront:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Back Accessories",
+			"help": "Chance of Back Accessories.",
+			"type": "slider",
+			"id": "iChanceBack:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Accessories",
-            "help": "Chance of Generic Accessories.",
-            "type": "slider",
-            "id": "iChanceAccessory:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Front Accessories",
+			"help": "Chance of Front Accessories.",
+			"type": "slider",
+			"id": "iChanceFront:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Weapons",
-            "help": "Chance of New Weapons from Data/F4SE/Plugins/OutfitShuffler/WeaponsList.ini.",
-            "type": "slider",
-            "id": "iChanceWeaponsList:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Accessories",
+			"help": "Chance of Generic Accessories.",
+			"type": "slider",
+			"id": "iChanceAccessory:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Long Hair Slot",
-            "help": "Chance of Long Hair Slot (Future Use, maybe)",
-            "type": "slider",
-            "id": "iChanceLongHair:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Weapons",
+			"help": "Chance of New Weapons from Data/F4SE/Plugins/OutfitShuffler/WeaponsList.ini.",
+			"type": "slider",
+			"id": "iChanceWeaponsList:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Jacket",
-            "help": "Chance of JacketSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceJacket:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Long Hair Slot",
+			"help": "Chance of Long Hair Slot (Future Use, maybe)",
+			"type": "slider",
+			"id": "iChanceLongHair:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "TorsoArmor",
-            "help": "Chance of TorsoArmorSlot (Future Use?)",
-            "type": "slider",
-            "id": "iTorsoArmorChance:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Jacket",
+			"help": "Chance of JacketSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceJacket:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "LeftArmArmor",
-            "help": "Chance of LeftArmArmorSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceLeftArmArmor:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "TorsoArmor",
+			"help": "Chance of TorsoArmorSlot (Future Use?)",
+			"type": "slider",
+			"id": "iTorsoArmorChance:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "RightArmArmor",
-            "help": "Chance of RightArmArmorSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceRightArmArmor:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "LeftArmArmor",
+			"help": "Chance of LeftArmArmorSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceLeftArmArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "LeftLegArmor",
-            "help": "Chance of LeftLegArmorSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceLeftLegArmor:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "RightArmArmor",
+			"help": "Chance of RightArmArmorSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceRightArmArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "RightLegArmor",
-            "help": "Chance of RightLegArmorSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceRightLegArmor:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "LeftLegArmor",
+			"help": "Chance of LeftLegArmorSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceLeftLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Earrings",
-            "help": "Chance of EarringsSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceEarrings:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "RightLegArmor",
+			"help": "Chance of RightLegArmorSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceRightLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Ring",
-            "help": "Chance of RingSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceRing:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Earrings",
+			"help": "Chance of EarringsSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceEarrings:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Backpack",
-            "help": "Chance of BackpackSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceBackpack:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Ring",
+			"help": "Chance of RingSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceRing:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "Shoulder",
-            "help": "Chance of ShoulderSlot (Future Use?)",
-            "type": "slider",
-            "id": "iChanceShoulder:General",
-            "valueOptions": {
-                "sourceType": "ModSettingInt",
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
+			"text": "Backpack",
+			"help": "Chance of BackpackSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceBackpack:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "<br>",
-            "html": true
-        },
+			"text": "Shoulder",
+			"help": "Chance of ShoulderSlot (Future Use?)",
+			"type": "slider",
+			"id": "iChanceShoulder:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
 		{
-            "text": "UNINSTALL! OUTFITS WILL NOT BE RESTORED!",
-            "type": "section"
-        },
+			"text": "<br>",
+			"html": true
+		},
+		{
+			"text": "UNINSTALL! OUTFITS WILL NOT BE RESTORED!",
+			"type": "section"
+		},
 		{
 			"id": "Uninstall:Global",
 			"text": "Uninstall",
@@ -464,6 +475,28 @@
 			"form": "OutfitShuffler.esl|0800",
 			"function": "JustEndItAll"
 			}
+		},
+		{
+		  "text": "Restart from OnInit()",
+		  "type": "button",
+		  "help": "Does what it says on the tin.",
+		  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|800",
+			"function": "OnInit"
+		  }
+		},
+		{
+			"text": "Leave Me Alone",
+			"help": "I exist to hold a variable. That's it.",
+			"type": "slider",
+			"id": "iChanceSafeItems:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 0,
+				"step": 1
+			}
 		}
-    ]
+	]
 }
