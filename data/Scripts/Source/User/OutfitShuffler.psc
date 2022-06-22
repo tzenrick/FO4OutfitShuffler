@@ -63,12 +63,7 @@ Keyword AAFBusyKeyword
 Event OnInit()
 	dlog("OutfitShuffler Installed")
 	debug.notification("[OutfitShuffler] Installed")
-	Int OutfitPartsCounter
-	Int OutfitPartsAdder
-	While OutfitPartsCounter < PForm.Length
-		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
-		OutfitPartsCounter += 1
-	endwhile
+	CountParts()
 	starttimer(ShortTime, ShortTimerID)
 	GetMCMSettings()
 EndEvent
@@ -132,13 +127,7 @@ endFunction
 ;****************************************************************************************************************
 function ScanNPCs(bool Force=False)
 	dlog("In ScanNPCs()")
-	Int OutfitPartsCounter
-	Int OutfitPartsAdder
-	While OutfitPartsCounter < PForm.Length
-		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
-		OutfitPartsCounter += 1
-	endwhile
-	dLog(OutfitPartsAdder +" parts in lists")
+	CountParts()
 	int racecounter = 0
 	While racecounter < ActorRaces.GetSize()
 		int i = 0
@@ -147,24 +136,34 @@ function ScanNPCs(bool Force=False)
 			Actor NPC = kActorArray[i] as Actor
 			if CheckEligibility(NPC)
 				if Force
-					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":is being forced")
+					dlog(i+"/"+kActorArray.length+""+NPC+NPC.GetLeveledActorBase().GetName()+":is being forced")
 					SetSettlerOutfit(NPC)
 				endif
 				if !GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
-					dlog(i+"/"+kActorArray.length+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
+					dlog(i+"/"+kActorArray.length+""+NPC+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
 					SetSettlerOutfit(NPC)
 				endif
+			else
 				if GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
-					int AAL=kActorArray.length
-					dlog(i+"/"+AAL+":"+NPC.GetLeveledActorBase().GetName()+":is wearing a good outfit")
-					ReEquipItems(NPC, i, AAL)
-				endIf
+					dlog(i+"/"+kActorArray.length+""+NPC+NPC.GetLeveledActorBase().GetName()+":is wearing a good outfit")
+					ReEquipItems(NPC)	
+				endif
 			endif
 			i += 1
 		endwhile
 		RaceCounter += 1
 	endwhile
 endFunction
+;****************************************************************************************************************
+Function CountParts()
+	Int OutfitPartsCounter
+	Int OutfitPartsAdder
+	While OutfitPartsCounter < PForm.Length
+		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
+		OutfitPartsCounter += 1
+	endwhile
+	dlog("=============================== "+OutfitPartsAdder+" items in outfit parts lists.")
+endfunction
 ;****************************************************************************************************************
 Function SetSettlerOutfit(Actor NPC)
 	dlog("In SetSettlerOutfit()")
@@ -335,9 +334,9 @@ endFunction
 ;****************************************************************************************************************
 
 ;****************************************************************************************************************
-Function ReEquipItems(Actor NPC, int p, int AAL)
+Function ReEquipItems(Actor NPC)
 	dlog("In ReEquipItems()")
-	dlog(p+"/"+AAL+":"+NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
+	dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
 	If NPC.GetLeveledActorBase().Getoutfit()==EmptyOutfit2
 		NPC.SetOutfit(EmptyOutfit)
 	else
@@ -468,15 +467,16 @@ Function RescanOutfitsINI()
 ;Get Races
 
 	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "Races")
-	Keys=Utility.VarToVarArray(ConfigOptions[0])
+	Var[] RaceKeys=Utility.VarToVarArray(ConfigOptions[0])
+	Var[] RaceValues=Utility.VarToVarArray(ConfigOptions[1])
 	j=0
 	ActorRaces.Revert()
-	While j<Keys.Length
-		int ConfigOptionsInt=LL_FourPlay.GetCustomConfigOption_UInt32(MasterINI, "Races", Keys[j]) as int
+	While j<RaceKeys.Length
+		int ConfigOptionsInt=RaceValues[j] as int
 		if ConfigOptionsInt > 0
-			dlog("******* "+LL_FourPlay.GetCustomConfigPath(MasterINI)+" sent "+Keys[j]+" Added to ActorRaces *******")
-			Debug.Notification("[OutfitShuffler] Adding "+Game.GetFormFromFile(ConfigOptionsInt, Keys[j])+" to Races")
-			ActorRaces.AddForm(Game.GetFormFromFile(ConfigOptionsInt,Keys[j]))
+			dlog("******* "+Game.GetFormFromFile(ConfigOptionsInt, RaceKeys[j])+" Added to ActorRaces *******")
+			Debug.Notification("[OutfitShuffler] Adding "+Game.GetFormFromFile(ConfigOptionsInt, RaceKeys[j])+" to Races")
+			ActorRaces.AddForm(Game.GetFormFromFile(ConfigOptionsInt,RaceKeys[j]))
 		endif
 	j += 1
 	endwhile
@@ -484,15 +484,16 @@ Function RescanOutfitsINI()
 ;Get FactionsToIgnore
 
 	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "FactionsToIgnore")
-	Keys=Utility.VarToVarArray(ConfigOptions[0])
+	Var[] FactionsToIgnoreKeys=Utility.VarToVarArray(ConfigOptions[0])
+	Var[] FactionsToIgnoreValues=Utility.VarToVarArray(ConfigOptions[1])
 	j=0
 	FactionsToIgnore.Revert()
-	While j<Keys.Length
-		int ConfigOptionsInt=LL_FourPlay.GetCustomConfigOption_UInt32(MasterINI, "FactionsToIgnore", Keys[j]) as int
+	While j<FactionsToIgnoreKeys.Length
+		int ConfigOptionsInt=FactionsToIgnoreValues[j] as int
 		if ConfigOptionsInt > 0
-			dlog("******* "+LL_FourPlay.GetCustomConfigPath(MasterINI)+" sent "+Keys[j]+" Added to FactionsToIgnore *******")
-			Debug.Notification("[OutfitShuffler] Adding "+Game.GetFormFromFile(ConfigOptionsInt, Keys[j])+" to FactionsToIgnore")
-			FactionsToIgnore.AddForm(Game.GetFormFromFile(ConfigOptionsInt, Keys[j]))
+			dlog("******* "+Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j])+" Added to FactionsToIgnore *******")
+			Debug.Notification("[OutfitShuffler] Adding "+Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j])+" to FactionsToIgnore")
+			FactionsToIgnore.AddForm(Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j]))
 		endif
 	j += 1
 	endwhile
