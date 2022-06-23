@@ -63,7 +63,6 @@ Keyword AAFBusyKeyword
 Event OnInit()
 	dlog("OutfitShuffler Installed")
 	debug.notification("[OutfitShuffler] Installed")
-	CountParts()
 	starttimer(ShortTime, ShortTimerID)
 	GetMCMSettings()
 EndEvent
@@ -71,13 +70,7 @@ EndEvent
 ;Catch timer events
 Event OnTimer(int aiTimerID)
 	dlog("In OnTimer()")
-	Int OutfitPartsCounter
-	Int OutfitPartsAdder
-	While OutfitPartsCounter < PForm.Length
-		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
-		OutfitPartsCounter += 1
-	endwhile
-	If OutfitPartsAdder<1
+	If CountParts()<1
 		RescanOutfitsINI()
 	endif
 	If pMQ101.IsRunning() && pMQ101.GetStage() < MQ101EarlyStage
@@ -91,8 +84,6 @@ Event OnTimer(int aiTimerID)
 		endif
 	endif
 EndEvent
-;****************************************************************************************************************
-;****************************************************************************************************************
 ;****************************************************************************************************************
 Function TimerTrap()
 	CancelTimer(ShortTimerID)
@@ -155,7 +146,7 @@ function ScanNPCs(bool Force=False)
 	endwhile
 endFunction
 ;****************************************************************************************************************
-Function CountParts()
+int Function CountParts()
 	Int OutfitPartsCounter
 	Int OutfitPartsAdder
 	While OutfitPartsCounter < PForm.Length
@@ -163,6 +154,7 @@ Function CountParts()
 		OutfitPartsCounter += 1
 	endwhile
 	dlog("=============================== "+OutfitPartsAdder+" items in outfit parts lists.")
+	return OutfitPartsAdder
 endfunction
 ;****************************************************************************************************************
 Function SetSettlerOutfit(Actor NPC)
@@ -189,19 +181,8 @@ Function SetOutfitFromParts(Actor NPC)
 					If Utility.RandomInt(1,99)<PChance[counter]
 						Form RandomItem = PForm[counter].GetAt(Utility.RandomInt(0,PForm[Counter].GetSize())) as Form
 						If RandomItem != None
+							dlog(NPC+" got "+RandomItem)
 							NPC.Equipitem(RandomItem)
-;								int SafeCounter = 0
-;								While SafeCounter<SafeItems.GetSize()
-;									dlog("Scanning for SafeItems "+(Safecounter+1)+"/"+SafeItems.GetSize()+"    ===SI    "+SafeItems.GetAt(SafeCounter)+" "+SafeItems.GetAt(SafeCounter).GetName()+"    ===RI    "+RandomItem+RandomItem.GetName())
-;									If NPC.IsEquipped(Safeitems.GetAt(SafeCounter))
-;										dlog(NPC+" Comparing "+RandomItem+" to "+SafeItems.GetAt(SafeCounter))
-;										if !OverwriteSafeItems(SafeItems.GetAt(SafeCounter) as Armor, RandomItem as Armor)
-;											NPC.Equipitem(RandomItem)
-;											;Dlog(RandomItem+" Would have Unequipped "+SafeItems.GetAt(SafeCounter))
-;										endif
-;									endif
-;								SafeCounter += 1
-;								Endwhile
 						endif
 					endif
 				endif
@@ -213,56 +194,6 @@ Function SetOutfitFromParts(Actor NPC)
 		NPC.AddKeyword(DontChange)
 	endif
 endfunction
-;****************************************************************************************************************
-;bool Function OverwriteSafeItems(Armor OldItem, Armor NewItem)
-;	dlog("In Bool OverwriteSafeItems()")
-;	int slots = OldItem.GetSlotMask()
-;	int counter=0
-;	int[] OldItemOutVal = new Int[32]
-;	While counter<32
-;		int tempx = Math.LeftShift(slots, counter)
-;		int tempy=1
-;		if tempx>0xEFFFFFFF
-;			tempy=0			
-;		endif
-;		OldItemOutVal[Counter]=TempY
-;		counter += 1
-;	endwhile
-;	
-;	slots = NewItem.GetSlotMask()
-;	counter=0
-;	int[] NewItemOutVal = new Int[32]
-;	While counter<32
-;		int tempx = Math.LeftShift(slots, counter)
-;		int tempy=1
-;		if tempx>0xEFFFFFFF
-;			tempy=0			
-;		endif
-;		NewItemOutVal[Counter]=TempY
-;		counter += 1
-;	endwhile
-;	
-;Dlog(OldItem+":"+OldItemOutVal[0]+""+OldItemOutVal[1]+""+OldItemOutVal[2]+""+OldItemOutVal[3]+""+OldItemOutVal[4]+""+OldItemOutVal[5]+""+OldItemOutVal[6]+""+OldItemOutVal[7]+\
-;	""+OldItemOutVal[8]+""+OldItemOutVal[9]+""+OldItemOutVal[10]+""+OldItemOutVal[11]+""+OldItemOutVal[12]+""+OldItemOutVal[13]+""+OldItemOutVal[14]+""+OldItemOutVal[15]+\
-;	""+OldItemOutVal[16]+""+OldItemOutVal[17]+""+OldItemOutVal[18]+""+OldItemOutVal[19]+""+OldItemOutVal[20]+""+OldItemOutVal[21]+""+OldItemOutVal[22]+""+OldItemOutVal[23]+\
-;	""+OldItemOutVal[24]+""+OldItemOutVal[25]+""+OldItemOutVal[26]+""+OldItemOutVal[27]+""+OldItemOutVal[28]+""+OldItemOutVal[29]+""+OldItemOutVal[30]+""+OldItemOutVal[31])
-;
-;	Dlog(NewItem+":"+NewItemOutVal[0]+""+NewItemOutVal[1]+""+NewItemOutVal[2]+""+NewItemOutVal[3]+""+NewItemOutVal[4]+""+NewItemOutVal[5]+""+NewItemOutVal[6]+""+NewItemOutVal[7]+\
-;	""+NewItemOutVal[8]+""+NewItemOutVal[9]+""+NewItemOutVal[10]+""+NewItemOutVal[11]+""+NewItemOutVal[12]+""+NewItemOutVal[13]+""+NewItemOutVal[14]+""+NewItemOutVal[15]+\
-;	""+NewItemOutVal[16]+""+NewItemOutVal[17]+""+NewItemOutVal[18]+""+NewItemOutVal[19]+""+NewItemOutVal[20]+""+NewItemOutVal[21]+""+NewItemOutVal[22]+""+NewItemOutVal[23]+\
-;	""+NewItemOutVal[24]+""+NewItemOutVal[25]+""+NewItemOutVal[26]+""+NewItemOutVal[27]+""+NewItemOutVal[28]+""+NewItemOutVal[29]+""+NewItemOutVal[30]+""+NewItemOutVal[31])
-;	
-;	counter = 0
-;	While Counter<32
-;		if OldItemOutVal[Counter]>0 && (NewItemOutVal[Counter] == OldItemOutVal[Counter])
-;			dlog("Bodyslot "+(counter+30)+" matches")
-;			return false
-;		endif
-;	counter += 1
-;	endwhile
-;	dlog("No bodyslot matches")
-;	return true
-;endfunction
 ;****************************************************************************************************************
 Bool Function CheckEligibility(Actor NPC)
 	dlog("In CheckEligibility()")
@@ -331,8 +262,6 @@ Bool Function CheckEligibility(Actor NPC)
 	endif
 	return true
 endFunction
-;****************************************************************************************************************
-
 ;****************************************************************************************************************
 Function ReEquipItems(Actor NPC)
 	dlog("In ReEquipItems()")
