@@ -57,6 +57,7 @@ FormList AAF_ActiveActors
 ActorBase AAF_Doppelganger
 Outfit AAF_EmptyOutfit
 Keyword AAFBusyKeyword
+Spell Maintainer
 ;****************************************************************************************************************
 ;****************************************************************************************************************
 ;****************************************************************************************************************
@@ -92,6 +93,9 @@ Function TimerTrap()
 	AAF_ActiveActors = Game.GetFormFromFile(0x0098f4, "AAF.esm") as FormList
 	AAF_Doppelganger = Game.GetFormFromFile(0x0072E2, "AAF.esm") as ActorBase
 	AAF_EmptyOutfit = Game.GetFormFromFile(0x02b47d, "AAF.esm") as Outfit
+	If Maintainer==None
+		Maintainer=Game.GetFormFromFile(0x827,"OutfitShuffler.esl") as Spell
+	endif
 	if AAF_EmptyOutfit != None
 		If !GoodOutfits.HasForm(AAF_EmptyOutfit)
 			dlog("Adding AAF_EmptyOutfit.")
@@ -134,11 +138,6 @@ function ScanNPCs(bool Force=False)
 					dlog(i+"/"+kActorArray.length+""+NPC+NPC.GetLeveledActorBase().GetName()+":needs an outfit")
 					SetSettlerOutfit(NPC)
 				endif
-			else
-				if GoodOutfits.HasForm(NPC.GetLeveledActorBase().Getoutfit())
-					dlog(i+"/"+kActorArray.length+""+NPC+NPC.GetLeveledActorBase().GetName()+":is wearing a good outfit")
-					ReEquipItems(NPC)	
-				endif
 			endif
 			i += 1
 		endwhile
@@ -166,25 +165,24 @@ Function SetSettlerOutfit(Actor NPC)
 		NPC.SetOutfit(EmptyOutfit2,false)
 		NPC.SetOutfit(EmptyOutfit,false)
 		SetOutfitFromParts(NPC)
+		If !NPC.HasSpell(Maintainer)
+			NPC.AddSpell(Maintainer)
+		endif
 	endif
 EndFunction
 ;****************************************************************************************************************
 Function SetOutfitFromParts(Actor NPC)
 	dlog("In SetOutfitParts()")
 	If Utility.RandomInt(1,99)<PChance[PString.Find("FullBody")] && PForm[PString.Find("FullBody")].GetSize()>0
-		NPC.Equipitem(PForm[PString.Find("FullBody")].GetAt(Utility.RandomInt(0,PForm[PString.Find("FullBody")].GetSize())))
+		NPC.EquipItem(PForm[PString.Find("FullBody")].GetAt(Utility.RandomInt(0,PForm[PString.Find("FullBody")].GetSize())))
 	else
 		Int Counter=1
 		While counter < PForm.Length
-			If PChance[Counter]>1
-				If PForm[Counter].GetSize()>0
-					If Utility.RandomInt(1,99)<PChance[counter]
-						Form RandomItem = PForm[counter].GetAt(Utility.RandomInt(0,PForm[Counter].GetSize())) as Form
-						If RandomItem != None
-							dlog(NPC+" got "+RandomItem)
-							NPC.Equipitem(RandomItem)
-						endif
-					endif
+			If PChance[Counter]>1 && PForm[Counter].GetSize()>0 && Utility.RandomInt(1,99)<PChance[counter]
+				Form RandomItem = PForm[counter].GetAt(Utility.RandomInt(0,PForm[Counter].GetSize())) as Form
+				If RandomItem != None
+					dlog(NPC+" got "+RandomItem)
+					NPC.EquipItem(RandomItem)
 				endif
 			endif
 		counter += 1
@@ -198,90 +196,40 @@ endfunction
 Bool Function CheckEligibility(Actor NPC)
 	dlog("In CheckEligibility()")
 	int index = 0
-	If NPC == Game.GetPlayer()
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is the PLAYER")
-		return False
-	endif
-	if NPC.HasKeyword(DontChange)
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is TAGGED DontChange")
-		return False
-	endif
-		if NPC.GetLeveledActorBase().GetSex() != 1
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is NOT FEMALE")
-		return False
-	endif
-	If !DressTheDead
-		If NPC.IsDead()
-			dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is DEAD")
-			return False
-		endif
-	endif
-	if NPC.IsDeleted()
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is DELETED")
-		return False
-	endif
-	if NPC.IsChild()
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is a CHILD")
-		return False
-	endif
-	if NPC.IsDisabled()
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is DISABLED")
-		return False
-	endif
-	If NPC.IsInPowerArmor()
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is IN POWER ARMOR")
+	if (NPC == Game.GetPlayer()) || (NPC.GetLeveledActorBase().GetSex() != 1) || NPC.HasKeyword(DontChange) || NPC.IsDeleted() || NPC.IsDisabled() || NPC.IsInPowerArmor() || NPC.IsChild()
 		return False
 	endif
 	if Game.GetPlayer().GetDistance(NPC) > ScanRange
-		dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is TOO FAR")
 		return False
-	Endif
+	endif
 	If FactionsToIgnore.GetSize()
 		Int i
 		While i<FactionsToIgnore.GetSize()
 			If NPC.IsInFaction(FactionsToIgnore.GetAt(i) as Faction)
-				dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is IN AN IGNORED FACTION "+FactionsToIgnore.GetAt(i).GetName())
 				return False
 			endif
 		i += 1
 		Endwhile
 	endif
+	If !DressTheDead
+		If NPC.IsDead()
+			return False
+		endif
+	endif
 	If UseAAF
-		if AAF_ActiveActors.HasForm(NPC)
-			dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is AAF ACTOR")
+		if AAF_ActiveActors.HasForm(NPC)||NPC.HasKeyword(AAFBusyKeyword)||(NPC.GetActorBase() == AAF_Doppelganger)
 			return false
 		endif
 		if NPC.HasKeyword(AAFBusyKeyword)
-			dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is AAF BUSY")
 			return false
 		endif
 		If NPC.GetActorBase() == AAF_Doppelganger
-			dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is a DOPPELGANGER")
 			return false
 		endif
 	endif
+	dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is eligible to be changed")
 	return true
 endFunction
-;****************************************************************************************************************
-Function ReEquipItems(Actor NPC)
-	dlog("In ReEquipItems()")
-	dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is being refreshed")
-	If NPC.GetLeveledActorBase().Getoutfit()==EmptyOutfit2
-		NPC.SetOutfit(EmptyOutfit)
-	else
-		NPC.SetOutfit(EmptyOutfit2)
-	endif
-	int i=0
-	Form[] InvItems = NPC.GetInventoryItems()
-	While (i < InvItems.Length)
-	Form akItem = InvItems[i]
-		If (akItem as Armor)
-			NPC.equipitem(akItem)
-			dlog(NPC+" re-equipping "+akItem.getname())
-		EndIf
-	i += 1
-	EndWhile
-endfunction
 ;****************************************************************************************************************
 Function UnEquipItems(Actor NPC)
 	dlog("In UnEquipItems()")
@@ -289,16 +237,12 @@ Function UnEquipItems(Actor NPC)
 	int i=0
 	While (i < InvItems.Length)
 	Form akItem = InvItems[i]
-		If SafeItems.HasForm(akItem)
-			dlog(NPC+" NOT REMOVING "+akitem+akItem.getname()+":IS TAGGED SAFE")
-		else
+		If !SafeItems.HasForm(akItem)
 			If (akItem as Armor)
 				NPC.removeitem(akItem, -1)
-				dlog(NPC+" removing "+akitem+akItem.getname())
 			EndIf
 			If WeaponsList.HasForm(akItem)
 				NPC.removeitem(akItem, -1)
-				dlog(NPC+" removing "+akitem+akItem.getname())
 			EndIf
 		endif
 	i += 1
@@ -334,7 +278,6 @@ Function ChangeNow()
 endfunction
 ;****************************************************************************************************************
 Function OutfitHotkey()
-	dlog("In OutfitHotkey()")
 	GetMCMSettings()
 	MultCounter = LongMult
 EndFunction
