@@ -187,6 +187,11 @@ Function SetOutfitFromParts(Actor NPC)
 			endif
 		counter += 1
 		endwhile
+		If DressTheDead
+			NPC.Disable()
+			NPC.Resurrect()
+			NPC.Enable()
+		endif
 	endif
 endfunction
 ;****************************************************************************************************************
@@ -210,7 +215,7 @@ Bool Function CheckEligibility(Actor NPC)
 	endif
 	If !DressTheDead
 		If NPC.IsDead()
-		NPC.AddKeyword(DontChange)
+			NPC.AddKeyword(DontChange)
 		return False
 		endif
 	endif
