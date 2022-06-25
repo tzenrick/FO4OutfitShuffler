@@ -159,9 +159,9 @@ endfunction
 Function SetSettlerOutfit(Actor NPC)
 	dlog("In SetSettlerOutfit()")
 	if CheckEligibility(NPC)
-		dlog(NPC+" is being sent to UnequipItems")
+;		dlog(NPC+" is being sent to UnequipItems")
 		UnEquipItems(NPC)
-		dlog(NPC+" Setting outfit "+EmptyOutfit)
+;		dlog(NPC+" Setting outfit "+EmptyOutfit)
 		NPC.SetOutfit(EmptyOutfit2,false)
 		NPC.SetOutfit(EmptyOutfit,false)
 		SetOutfitFromParts(NPC)
@@ -172,7 +172,7 @@ Function SetSettlerOutfit(Actor NPC)
 EndFunction
 ;****************************************************************************************************************
 Function SetOutfitFromParts(Actor NPC)
-	dlog("In SetOutfitParts()")
+;	dlog("In SetOutfitParts()")
 	If Utility.RandomInt(1,99)<PChance[PString.Find("FullBody")] && PForm[PString.Find("FullBody")].GetSize()>0
 		NPC.EquipItem(PForm[PString.Find("FullBody")].GetAt(Utility.RandomInt(0,PForm[PString.Find("FullBody")].GetSize())))
 	else
@@ -188,13 +188,10 @@ Function SetOutfitFromParts(Actor NPC)
 		counter += 1
 		endwhile
 	endif
-	If NPC.IsDead()
-		NPC.AddKeyword(DontChange)
-	endif
 endfunction
 ;****************************************************************************************************************
 Bool Function CheckEligibility(Actor NPC)
-	dlog("In CheckEligibility()")
+;	dlog("In CheckEligibility()")
 	int index = 0
 	if (NPC == Game.GetPlayer()) || (NPC.GetLeveledActorBase().GetSex() != 1) || NPC.HasKeyword(DontChange) || NPC.IsDeleted() || NPC.IsDisabled() || NPC.IsInPowerArmor() || NPC.IsChild()
 		return False
@@ -213,37 +210,26 @@ Bool Function CheckEligibility(Actor NPC)
 	endif
 	If !DressTheDead
 		If NPC.IsDead()
-			return False
+		NPC.AddKeyword(DontChange)
+		return False
 		endif
 	endif
-	If UseAAF
-		if AAF_ActiveActors.HasForm(NPC)||NPC.HasKeyword(AAFBusyKeyword)||(NPC.GetActorBase() == AAF_Doppelganger)
-			return false
-		endif
-		if NPC.HasKeyword(AAFBusyKeyword)
-			return false
-		endif
-		If NPC.GetActorBase() == AAF_Doppelganger
-			return false
-		endif
+	if UseAAF && (AAF_ActiveActors.HasForm(NPC) || NPC.HasKeyword(AAFBusyKeyword) || ((NPC.GetActorBase() == AAF_Doppelganger)))
+		return false
 	endif
-	dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is eligible to be changed")
+;	dlog(NPC+NPC.GetLeveledActorBase().GetName()+" is eligible to be changed")
 	return true
 endFunction
 ;****************************************************************************************************************
 Function UnEquipItems(Actor NPC)
-	dlog("In UnEquipItems()")
+;	dlog("In UnEquipItems()")
 	Form[] InvItems = NPC.GetInventoryItems()
 	int i=0
 	While (i < InvItems.Length)
 	Form akItem = InvItems[i]
-		If !SafeItems.HasForm(akItem)
-			If (akItem as Armor)
-				NPC.removeitem(akItem, -1)
-			EndIf
-			If WeaponsList.HasForm(akItem)
-				NPC.removeitem(akItem, -1)
-			EndIf
+		If !SafeItems.HasForm(akItem) && ((akItem as Armor) || WeaponsList.HasForm(akItem))
+			NPC.removeitem(akItem, -1)
+			dlog(NPC+" removed "+akItem)
 		endif
 	i += 1
 	EndWhile
