@@ -110,9 +110,9 @@
 		},
 		{
 			"id": "DontChange",
-			"text": "Toggle Ignore this NPC",
+			"text": "Toggle Ignore this NPC/Ignore Faction exclusion",
 			"type": "hotkey",
-			"help": "This toggles ignoring or enabling the targeted NPC for outfit changes.",
+			"help": "This toggles AlwaysChange, DontChange or default changing behavior.",
 			"valueOptions": {
 			"allowModifierKeys": true
 			}

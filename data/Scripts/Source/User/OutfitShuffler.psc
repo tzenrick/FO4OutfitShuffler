@@ -37,6 +37,7 @@ Formlist Property Front Auto
 Formlist Property Accessory Auto
 FormList Property SafeItems Auto
 Keyword Property DontChange Auto Const
+Keyword Property AlwaysChange Auto Const
 float Property ShortTime Auto
 int Property LongMult Auto
 float Property ScanRange Auto
@@ -158,16 +159,12 @@ endfunction
 ;****************************************************************************************************************
 Function SetSettlerOutfit(Actor NPC)
 	dlog("In SetSettlerOutfit()")
-	if CheckEligibility(NPC)
-;		dlog(NPC+" is being sent to UnequipItems")
-		UnEquipItems(NPC)
-;		dlog(NPC+" Setting outfit "+EmptyOutfit)
-		NPC.SetOutfit(EmptyOutfit2,false)
-		NPC.SetOutfit(EmptyOutfit,false)
-		SetOutfitFromParts(NPC)
-		If !NPC.HasSpell(Maintainer)
-			NPC.AddSpell(Maintainer)
-		endif
+	UnEquipItems(NPC)
+	NPC.SetOutfit(EmptyOutfit2,false)
+	NPC.SetOutfit(EmptyOutfit,false)
+	SetOutfitFromParts(NPC)
+	If !NPC.HasSpell(Maintainer)
+		NPC.AddSpell(Maintainer)
 	endif
 EndFunction
 ;****************************************************************************************************************
@@ -187,9 +184,9 @@ Function SetOutfitFromParts(Actor NPC)
 			endif
 		counter += 1
 		endwhile
-		If DressTheDead
+		If DressTheDead && NPC.IsDead()
 			NPC.Disable()
-			NPC.Resurrect()
+			;NPC.Resurrect()
 			NPC.Enable()
 		endif
 	endif
@@ -208,7 +205,9 @@ Bool Function CheckEligibility(Actor NPC)
 		Int i
 		While i<FactionsToIgnore.GetSize()
 			If NPC.IsInFaction(FactionsToIgnore.GetAt(i) as Faction)
-				return False
+				If !NPC.HasKeyword(AlwaysChange)
+					return False
+				endif
 			endif
 		i += 1
 		Endwhile
@@ -280,13 +279,20 @@ Function DontChange()
 	If ScannedActor != None
 		If ScannedActor.HasKeyword(DontChange)
 			ScannedActor.RemoveKeyword(DontChange)
-			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will be changed.")
-			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword removed, and SHOULD be changed.")
-		else
-			ScannedActor.AddKeyword(DontChange)
-			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will NOT be changed.")
-			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword added, and SHOULD NOT be changed.")
+			ScannedActor.AddKeyword(AlwaysChange)
+			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" will ignore faction exclusions.")
+			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their AlwaysChange keyword Added, and will ignore faction exclusions.")
+			return
 		endif
+		If ScannedActor.HasKeyword(AlwaysChange)
+			ScannedActor.RemoveKeyword(AlwaysChange)
+			debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" WILL be changed.")
+			dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their AlwaysChange keyword Removed, and WILL be changed.")
+			return
+		endif
+		ScannedActor.AddKeyword(DontChange)
+		debug.notification("[OutfitShuffler]"+ScannedActor.GetLeveledActorBase().GetName()+" WILL NOT be changed.")
+		dlog(ScannedActor.GetLeveledActorBase().GetName()+" has had their DontChange keyword Added, and WILL NOT be changed.")
 	endif
 EndFunction
 ;****************************************************************************************************************
