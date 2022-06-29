@@ -1,3 +1,5 @@
+20220628: 4.9 Added an AlwaysChange keyword for people you want to change regardless of faction affiliation.
+
 20220624: 4.8 Created a second script to handle keeping outfits on NPCs. Main script runs much faster. NPCs will receive their script at their next outfit change.
 
 20220623: 4.6 Cleaned up the main scripts a bit. Updated xEdit script to handle armor or weapons, and to export entire record on one line. (now they can be imported with spreadsheet software, and possibly more easily sorted.)
