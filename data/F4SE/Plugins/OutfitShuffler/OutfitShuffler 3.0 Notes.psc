@@ -1,8 +1,8 @@
-string[] Function GetCustomConfigSections(string fileName) native global
+string[XX] Function GetCustomConfigSections(string fileName) native global
 
 ; Get all the keys and values contained in a section. Both at once to avoid discrepancies in the order.
-;	The keys are in VarToVarArray(Var[0]) as String[] and the values in VarToVarArray(Var[1]) as String[]
-Var[] Function GetCustomConfigOptions(string fileName, string section) native global
+;	The keys are in VarToVarArray(Var[XX0]) as String[XX] and the values in VarToVarArray(Var[XX1]) as String[XX]
+Var[XX] Function GetCustomConfigOptions(string fileName, string section) native global
 
 int Function GetCustomConfigOption_UInt32(string name, string section, string key) native global
 

@@ -22,14 +22,32 @@
 			}
 		},
 		{
+			"text": "    Enable Females",
+			"help": "Enable or disable changing female NPCs.",
+			"type": "switcher",
+			"id": "bEnableXX:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
+		{
+			"text": "    Enable Males",
+			"help": "Enable or disable changing male NPCs.",
+			"type": "switcher",
+			"id": "bEnableXY:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
+		{
 			"text": "<br>",
 			"html": true
 		},
 		{
-			"text": "Dress the Dead",
-			"help": "Put outfits on dead bodies.",
+			"text": "Allow Base/DLC outfits?",
+			"help": "Allow Base Game and DLC outfit items to be worn.",
 			"type": "switcher",
-			"id": "bDressTheDead:General",
+			"id": "bAllowDLC:General",
 			"valueOptions": {
 				"sourceType": "ModSettingBool"
 			}
@@ -118,6 +136,15 @@
 			}
 		},
 		{
+			"id": "DebugNPC",
+			"text": "Output Debug Information for NPC",
+			"type": "hotkey",
+			"help": "Output NPC Status",
+			"valueOptions": {
+			"allowModifierKeys": true
+			}
+		},
+		{
 			"text": "<br>",
 			"html": true
 		},
@@ -154,166 +181,6 @@
 			"html": true
 		},
 		{
-			"text": "Chances of parts",
-			"type": "section"
-		},
-		{
-			"text": "Full Body",
-			"help": "Chance of Full Body Suit instead of building from Parts.",
-			"type": "slider",
-			"id": "iChanceFullBody:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Shoes",
-			"help": "Chance of shoes and boots.",
-			"type": "slider",
-			"id": "iChanceShoes:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Top",
-			"help": "Chance of getting a top.",
-			"type": "slider",
-			"id": "iChanceTop:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Bottom",
-			"help": "Chance of Bottoms.",
-			"type": "slider",
-			"id": "iChanceBottom:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Arm Addons",
-			"help": "Chance of Arm Addons, like bracelets, sleeve objects, or wraps.",
-			"type": "slider",
-			"id": "iChanceArmAddon:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Neck Items",
-			"help": "Chance of Necklaces, scarves, chokers, etc.",
-			"type": "slider",
-			"id": "iChanceNeck:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Belts",
-			"help": "Chance of Belts.",
-			"type": "slider",
-			"id": "iChanceBelt:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Wigs or Hats",
-			"help": "Chance of Wigs or Hats.",
-			"type": "slider",
-			"id": "iChanceHair:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Glasses",
-			"help": "Chance of Glasses/Sunglasses.",
-			"type": "slider",
-			"id": "iChanceGlasses:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Legs",
-			"help": "Chance of Leg Wraps, Stocking, or Socks.",
-			"type": "slider",
-			"id": "iChanceLegs:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Back Accessories",
-			"help": "Chance of Back Accessories.",
-			"type": "slider",
-			"id": "iChanceBack:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Front Accessories",
-			"help": "Chance of Front Accessories.",
-			"type": "slider",
-			"id": "iChanceFront:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
-			"text": "Accessories",
-			"help": "Chance of Generic Accessories.",
-			"type": "slider",
-			"id": "iChanceAccessory:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 100,
-				"step": 1
-			}
-		},
-		{
 			"text": "Weapons",
 			"help": "Chance of New Weapons from Data/F4SE/Plugins/OutfitShuffler/WeaponsList.ini.",
 			"type": "slider",
@@ -326,10 +193,170 @@
 			}
 		},
 		{
+			"text": "Chances of female outfit parts",
+			"type": "section"
+		},
+		{
+			"text": "Full Body",
+			"help": "Chance of Full Body Suit instead of building from Parts.",
+			"type": "slider",
+			"id": "iChanceXXFullBody:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Shoes",
+			"help": "Chance of shoes and boots.",
+			"type": "slider",
+			"id": "iChanceXXShoes:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Top",
+			"help": "Chance of getting a top.",
+			"type": "slider",
+			"id": "iChanceXXTop:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Bottom",
+			"help": "Chance of Bottoms.",
+			"type": "slider",
+			"id": "iChanceXXBottom:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Arm Addons",
+			"help": "Chance of Arm Addons, like bracelets, sleeve objects, or wraps.",
+			"type": "slider",
+			"id": "iChanceXXArmAddon:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Neck Items",
+			"help": "Chance of Necklaces, scarves, chokers, etc.",
+			"type": "slider",
+			"id": "iChanceXXNeck:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Belts",
+			"help": "Chance of Belts.",
+			"type": "slider",
+			"id": "iChanceXXBelt:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Wigs or Hats",
+			"help": "Chance of Wigs or Hats.",
+			"type": "slider",
+			"id": "iChanceXXHair:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Glasses",
+			"help": "Chance of Glasses/Sunglasses.",
+			"type": "slider",
+			"id": "iChanceXXGlasses:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Legs",
+			"help": "Chance of Leg Wraps, Stocking, or Socks.",
+			"type": "slider",
+			"id": "iChanceXXLegs:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Back Accessories",
+			"help": "Chance of Back Accessories.",
+			"type": "slider",
+			"id": "iChanceXXBack:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Front Accessories",
+			"help": "Chance of Front Accessories.",
+			"type": "slider",
+			"id": "iChanceXXFront:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Accessories",
+			"help": "Chance of Generic Accessories.",
+			"type": "slider",
+			"id": "iChanceXXAccessory:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
 			"text": "Long Hair Slot",
 			"help": "Chance of Long Hair Slot (Future Use, maybe)",
 			"type": "slider",
-			"id": "iChanceLongHair:General",
+			"id": "iChanceXXLongHair:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -339,9 +366,9 @@
 		},
 		{
 			"text": "Jacket",
-			"help": "Chance of JacketSlot (Future Use?)",
+			"help": "Chance of JacketSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceJacket:General",
+			"id": "iChanceXXJacket:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -351,7 +378,7 @@
 		},
 		{
 			"text": "TorsoArmor",
-			"help": "Chance of TorsoArmorSlot (Future Use?)",
+			"help": "Chance of TorsoArmorSlot (Future/Custom Use?)",
 			"type": "slider",
 			"id": "iTorsoArmorChance:General",
 			"valueOptions": {
@@ -363,9 +390,9 @@
 		},
 		{
 			"text": "LeftArmArmor",
-			"help": "Chance of LeftArmArmorSlot (Future Use?)",
+			"help": "Chance of LeftArmArmorSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceLeftArmArmor:General",
+			"id": "iChanceXXLeftArmArmor:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -375,9 +402,9 @@
 		},
 		{
 			"text": "RightArmArmor",
-			"help": "Chance of RightArmArmorSlot (Future Use?)",
+			"help": "Chance of RightArmArmorSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceRightArmArmor:General",
+			"id": "iChanceXXRightArmArmor:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -387,9 +414,9 @@
 		},
 		{
 			"text": "LeftLegArmor",
-			"help": "Chance of LeftLegArmorSlot (Future Use?)",
+			"help": "Chance of LeftLegArmorSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceLeftLegArmor:General",
+			"id": "iChanceXXLeftLegArmor:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -399,9 +426,9 @@
 		},
 		{
 			"text": "RightLegArmor",
-			"help": "Chance of RightLegArmorSlot (Future Use?)",
+			"help": "Chance of RightLegArmorSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceRightLegArmor:General",
+			"id": "iChanceXXRightLegArmor:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -411,9 +438,9 @@
 		},
 		{
 			"text": "Earrings",
-			"help": "Chance of EarringsSlot (Future Use?)",
+			"help": "Chance of EarringsSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceEarrings:General",
+			"id": "iChanceXXEarrings:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -423,9 +450,9 @@
 		},
 		{
 			"text": "Ring",
-			"help": "Chance of RingSlot (Future Use?)",
+			"help": "Chance of RingSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceRing:General",
+			"id": "iChanceXXRing:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -435,9 +462,9 @@
 		},
 		{
 			"text": "Backpack",
-			"help": "Chance of BackpackSlot (Future Use?)",
+			"help": "Chance of BackpackSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceBackpack:General",
+			"id": "iChanceXXBackpack:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -447,9 +474,305 @@
 		},
 		{
 			"text": "Shoulder",
-			"help": "Chance of ShoulderSlot (Future Use?)",
+			"help": "Chance of ShoulderSlot (Future/Custom Use?)",
 			"type": "slider",
-			"id": "iChanceShoulder:General",
+			"id": "iChanceXXShoulder:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "<br>",
+			"html": true
+		},
+		{
+			"text": "Chances of male outfit parts",
+			"type": "section"
+		},
+		{
+			"text": "Full Body",
+			"help": "Chance of Full Body Suit instead of building from Parts.",
+			"type": "slider",
+			"id": "iChanceXYFullBody:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Shoes",
+			"help": "Chance of shoes and boots.",
+			"type": "slider",
+			"id": "iChanceXYShoes:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Top",
+			"help": "Chance of getting a top.",
+			"type": "slider",
+			"id": "iChanceXYTop:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Bottom",
+			"help": "Chance of Bottoms.",
+			"type": "slider",
+			"id": "iChanceXYBottom:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Arm Addons",
+			"help": "Chance of Arm Addons, like bracelets, sleeve objects, or wraps.",
+			"type": "slider",
+			"id": "iChanceXYArmAddon:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Neck Items",
+			"help": "Chance of Necklaces, scarves, chokers, etc.",
+			"type": "slider",
+			"id": "iChanceXYNeck:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Belts",
+			"help": "Chance of Belts.",
+			"type": "slider",
+			"id": "iChanceXYBelt:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Wigs or Hats",
+			"help": "Chance of Wigs or Hats.",
+			"type": "slider",
+			"id": "iChanceXYHair:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Glasses",
+			"help": "Chance of Glasses/Sunglasses.",
+			"type": "slider",
+			"id": "iChanceXYGlasses:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Legs",
+			"help": "Chance of Leg Wraps, Stocking, or Socks.",
+			"type": "slider",
+			"id": "iChanceXYLegs:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Back Accessories",
+			"help": "Chance of Back Accessories.",
+			"type": "slider",
+			"id": "iChanceXYBack:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Front Accessories",
+			"help": "Chance of Front Accessories.",
+			"type": "slider",
+			"id": "iChanceXYFront:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Accessories",
+			"help": "Chance of Generic Accessories.",
+			"type": "slider",
+			"id": "iChanceXYAccessory:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Long Hair Slot",
+			"help": "Chance of Long Hair Slot (Future Use, maybe)",
+			"type": "slider",
+			"id": "iChanceXYLongHair:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Jacket",
+			"help": "Chance of JacketSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYJacket:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "TorsoArmor",
+			"help": "Chance of TorsoArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iTorsoArmorChance:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "LeftArmArmor",
+			"help": "Chance of LeftArmArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYLeftArmArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "RightArmArmor",
+			"help": "Chance of RightArmArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYRightArmArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "LeftLegArmor",
+			"help": "Chance of LeftLegArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYLeftLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "RightLegArmor",
+			"help": "Chance of RightLegArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYRightLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Earrings",
+			"help": "Chance of EarringsSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYEarrings:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Ring",
+			"help": "Chance of RingSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYRing:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Backpack",
+			"help": "Chance of BackpackSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYBackpack:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "Shoulder",
+			"help": "Chance of ShoulderSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYShoulder:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -485,18 +808,6 @@
 			"form": "OutfitShuffler.esl|800",
 			"function": "OnInit"
 		  }
-		},
-		{
-			"text": "Leave Me Alone",
-			"help": "I exist to hold a variable. That's it.",
-			"type": "slider",
-			"id": "iChanceSafeItems:General",
-			"valueOptions": {
-				"sourceType": "ModSettingInt",
-				"min": 0,
-				"max": 0,
-				"step": 1
-			}
 		}
 	]
 }

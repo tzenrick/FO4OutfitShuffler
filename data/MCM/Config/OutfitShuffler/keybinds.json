@@ -30,6 +30,16 @@
 			"function": "ChangeNow",
 			"params": []
 	  }	
+    },
+	{
+      "id": "DebugNPC",
+      "desc": "Changes an NPC as close to NOW as possible.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "DebugNPC",
+			"params": []
+	  }	
     }
   ]
 }
