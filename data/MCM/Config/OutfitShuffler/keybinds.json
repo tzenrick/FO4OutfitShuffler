@@ -40,6 +40,26 @@
 			"function": "DebugNPC",
 			"params": []
 	  }	
+    },
+	{
+      "id": "RandomBodyGen",
+      "desc": "This changes to a random BodyGen setting, but leaves the outfit the same.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "RandomBodyGen",
+			"params": []
+	  }	
+    },
+		{
+      "id": "NPCGetHeadParts",
+      "desc": "This prints and logs HeadParts from targeted NPC.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "NPCGetHeadParts",
+			"params": []
+	  }	
     }
   ]
 }

@@ -4,20 +4,20 @@ Scriptname LL_FourPlay Native Hidden
 ;	Shared community library of utility function from LoverLab distributed with FourPlay resources as a F4SE plugin with sources included
 ;
 
-;	Version 35 for runtime 1.10.138	2019 11 01 by jaam and Chosen Clue and EgoBallistic
+;	Version 42 for runtime 1.10.163	2021 09 13 by jaam and Chosen Clue and EgoBallistic and Fedim
 
-;	Runtime version: This file should be runtime neutral. The accompanying F4SE plugin (ll_fourplay_1_10_138.dll) is NOT!
+;	Runtime version: This file should be runtime neutral. The accompanying F4SE plugin (ll_fourplay_1_10_163.dll) is NOT!
 ;		You need to always use a plugin corresponding with the game version you play.
 ;		Plugin should be available just after F4SE has been updated for the modified runtime.
 ;		Runtime versions lower than 1.10.138 will no longer be supported.
-;		Written and tested against F4SE 0.6.17. You should not use an older version of F4SE.
+;		Written and tested against F4SE 0.6.21. You should not use an older version of F4SE.
 ;
 ;
 ;
 
 ; Returns the version of this script (when someone has not forgotten to update it :) )
 Float Function GetLLFPScriptVersion() global
-	return 35.0
+	return 42.0
 endFunction
 
 ; Returns the version of the plugin and servers to verify it is properly installed.
@@ -138,6 +138,11 @@ string[] Function StringSplit(string theString, string delimiter = ",") native g
 ;	Opposite of StringSplit.
 string Function StringJoin(string[] theStrings, string delimiter = ",") native global
 
+;	Converts an integer of any base to a hexadecimal string representation
+string Function IntToHexString(Int num) native global
+
+;	Converts a hexadecimal string to an integer
+Int Function HexStringToInt(String theString) native global
 
 ;
 ;	Array functions
@@ -223,6 +228,9 @@ bool Function ActorBaseIsClean(Actor akActor) native global
 ;	Return the WNAM ARMO of either the actor base or the actor's race
 Form Function GetActorBaseSkinForm(Actor akActor) native global
 
+;	Copy the base skin of one actor onto another as a skin override, similar to what LooksMenu does
+bool Function CopyActorBaseskinForm(Actor akSourceActor, Actor akDestActor) native global
+
 ;	MFG morph function provided by EgoBallistic
 
 ;   Apply a MFG Morph to the actor
@@ -255,6 +263,17 @@ bool Function MfgApplyMorphSet(Actor akActor, int[] morphIDs, int[] values) nati
 ;TBT;	bool Function ObjectReferenceGetCollision(ObjectReference akObject) native global
 
 ;
+;	Cell Functions
+;   ==============
+;
+
+;	Returns the number of references of type formType in cell. Use GetFormType() below for formType values. If formType is 0 this returns the count of all refs in the cell.
+Int Function GetNumRefsInCell(Cell akCell, Int formType) native global
+
+;   Returns nth reference of type formType in cell.  If formType is 0 this returns the nth reference of any type.
+ObjectReference Function GetNthRefInCell(Cell akCell, Int index, Int formType) native global
+
+;
 ;	Misc. Form functions
 ;	====================
 ;
@@ -271,6 +290,18 @@ Int Function OriginalPluginID(Form akForm) native global
 ; Returns whether a form is in a given leveled item list
 bool Function GetInLeveledItem(Leveleditem akList, Form akForm) native global
 
+; Return a form's record flags
+Int Function GetRecordFlags(Form akForm) native global
+
+; Return a form's formType
+Int Function GetFormType(Form akForm) native global
+
+; Return whether form is persistent or not
+Bool Function IsPersistent(Form akForm) native global
+
+; Set a form persistent or not. Returns false if form does not exist
+Bool Function SetPersistent(Form akForm, bool akFlag) native global
+
 ;
 ;	Misc functions
 ;	==============
@@ -286,3 +317,25 @@ bool Function PrintConsole(String text) native global
 ; hidden function, use ResizeVarArray instead
 Var[] Function ResizeVarArrayInternal(Var[] theArray, int theSize, Var theFill) native global
 
+;
+;	Wav function (by Fedim)
+;
+
+;	Plays a WAV file. FileName relative to "Data\Sound\Voice\"
+;	Option is possible "Data\Sound\Voice\MyPlugin\sound001.wav"
+Function PlaySoundWav(string FileName) native global
+
+;	Returns the current volume level of the player (-1 = 0xFFFFFFFF -> max)
+;	LowWord	  - left channel volume
+;	HeighWorg - right channel volume
+;	0 <= volume <= 65535 (0xFFFF)
+int Function GetVolumeWav() native global
+
+;	Sets the volume of the player channels
+;	0 <= volume <=65535 (0xFFFF)
+int Function SetVolumeWav(int volumeA, int volumeB) native global
+
+;	Randomly selects a line from the SectionText section of the "Data\F4SE\Plugins\PluginName.ini" file, plays the WAV and returns the text
+;	ini file must be UTF-8 encoded
+;	Sounds should be in the "Data\Sound\Voice\PluginName.esp\"
+String Function VoiceMessage(String PluginName, String SectionText) native global
