@@ -1,4 +1,7 @@
 20221116: 6.5 Lots of code cleanup, much cleaner/more readable debugging. Optimization for speed.
+
+  The directory structure is screwy but I screwed up during upload. I'll fix it later. ALL of the source is included in the release package.
+
 20221028: 6.2 6.1 is still hot hot. I decided that 'Armor Rack's tagged with AlwaysChange, will cycle. (I can already feel 6.3 coming... Only change once.)
 20221028: 6.1 Anything named "Armor Rack" will not automatically get its clothes changed... They can still be changed if you use the 'Change Now' Hotkey. They look like crap, but they change.
 20221028: 6.0 6.0 was a huge, major overhaul, that integrated male and female into a single script and ESL package, with all new outfit config files[seriously, go look at the config files], and was depreciated before it was released.
