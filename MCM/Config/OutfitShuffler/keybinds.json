@@ -1,0 +1,65 @@
+{
+  "modName": "OutfitShuffler",
+  "keybinds": [
+    {
+      "id": "UpdateAllOutfits",
+      "desc": "This hotkey forces an outfit change for all NPCs.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "OutfitHotkey",
+			"params": []
+	  }	
+    },
+	{
+      "id": "DontChange",
+      "desc": "Toggle Outfit Changes for this NPC.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "DontChange",
+			"params": []
+	  }	
+    },
+	{
+      "id": "ChangeNow",
+      "desc": "Changes an NPC as close to NOW as possible.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "ChangeNow",
+			"params": []
+	  }	
+    },
+	{
+      "id": "DebugNPC",
+      "desc": "Changes an NPC as close to NOW as possible.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "DebugNPC",
+			"params": []
+	  }	
+    },
+	{
+      "id": "RandomBodyGen",
+      "desc": "This changes to a random BodyGen setting, but leaves the outfit the same.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "RandomBodyGen",
+			"params": []
+	  }	
+    },
+	{
+      "id": "NoisyConsole",
+      "desc": "This prints and logs HeadParts from targeted NPC.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "NoisyConsole",
+			"params": []
+	  }	
+    }
+  ]
+}
