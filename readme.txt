@@ -1,3 +1,13 @@
+20221201: 6.9
+Nice.
+Huge Speed and Stability improvements.
+There was an accidental soft-dependency on AAF in previous versions. It would have caused extra outfit changes on some NPCs. Talos II Exosuits are now properly protected.
+(I will get around to the [Races] and [FactionsToIgnore] in the OufitShuffler.ini, in due time. It's on the list.)
+
+Unreleased: 6.8 Fixed the pesky issue that was removing clothing from everyone...I think.
+Unreleased: 6.7 Outfit INI files now accept standard hexadecimal, so no more converting.
+Unreleased: 6.6 Cleaned up most of the outfit 'flicker.' (When two items keep replacing each other.) 
+
 20221116: 6.5 Lots of code cleanup, much cleaner/more readable debugging. Optimization for speed.
 
   The directory structure is screwy but I screwed up during upload. I'll fix it later. ALL of the source is included in the release package.
