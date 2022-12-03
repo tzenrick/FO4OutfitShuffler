@@ -1,6 +1,7 @@
-20221201: 6.9
-Nice.
-Huge Speed and Stability improvements.
+20221203: 7.0 BodyGen options now include a "BodyGen OneShot" option, that will only regenerate the NPCs once, then flag them to not change, even if their outfit does. Hotkey is available to change NPCs even if the other BodyGen options are disabled.
+[Races] and [FactionsToIgnore] in the OufitShuffler.ini, now accept regular hexadecimal values. 0x123456 <== Is the correct format to use.
+
+20221201: 6.9 Nice. Huge Speed and Stability improvements.
 There was an accidental soft-dependency on AAF in previous versions. It would have caused extra outfit changes on some NPCs. Talos II Exosuits are now properly protected.
 (I will get around to the [Races] and [FactionsToIgnore] in the OufitShuffler.ini, in due time. It's on the list.)
 
