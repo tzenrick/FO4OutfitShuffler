@@ -10,6 +10,7 @@ Scriptname OutfitShuffler extends Quest
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Imported Properties from ESP
+Actor Property PlayerRef Auto Const
 Quest Property OutfitShufflerQuest Auto Const
 Quest Property pMQ101 Auto Const mandatory
 
@@ -79,13 +80,21 @@ Formlist Property XYShoulder Auto
 Formlist Property XYTop Auto
 Formlist Property XYTorsoArmor Auto
 
+Formlist Property OSAllItems Auto
+
 Keyword Property DontChange Auto Const
 Keyword Property AlwaysChange Auto Const
 Keyword Property OSWait Auto Const
+Keyword Property OSBodyDone Auto Const
 
 Spell Property Maintainer Auto Const
+Spell Property ContainersSpell Auto Const
 
 GlobalVariable Property OSSuspend Auto
+
+float Property ShortTime Auto
+float Property ScanRange Auto
+int Property LongMult Auto
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,13 +111,12 @@ float NPCMinScale
 float NPCMaxScale
 int LogLevel
 bool NoisyConsole
-float Property ShortTime Auto
-int Property LongMult Auto
-float Property ScanRange Auto
 Bool OneShot
+Bool BodyGenOneShot
 Bool RandomBodyGen
 Bool UseAAF
 Bool NoNudes
+Bool UseContainers
 
 FormList[] PForm
 String[] PString
@@ -118,13 +126,13 @@ FormList AAF_ActiveActors
 ActorBase AAF_Doppelganger
 Outfit AAF_EmptyOutfit
 Keyword AAFBusyKeyword
-Actor GameGetPlayer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnInit()
 	dLog(2,"Installed ****************************************************************************************************************")
 	int counter
+	OSAllItems.Revert()
 	While counter < PForm.Length ; This feels agressive, but necessary. As long as it doesn't do it on every load, I'll be happy. ;Seems to work as fucking intended, somehow.
 		PForm[counter].revert()
 		counter += 1
@@ -156,8 +164,18 @@ Event OnTimer(int aiTimerID)
 		if aiTimerID == ShortTimerID
 			if modEnabled
 				dLog(1,"*** To TimerTrap()   "+MultCounter+"/"+LongMult+" ***")
+				If !PlayerRef.HasSpell(ContainersSpell) && UseContainers
+					PlayerRef.AddSpell(ContainersSpell)
+					dlog(2,"*** OSContainers\nAdded Spell "+ContainersSpell+" to "+PlayerRef)
+				endif
+				If !UseContainers
+					PlayerRef.RemoveSpell(ContainersSpell)
+					dlog(2,"*** OSContainers\nRemoved Spell "+ContainersSpell+" from "+PlayerRef)
+				endif
 				TimerTrap()
 			else
+				PlayerRef.RemoveSpell(ContainersSpell)
+				dlog(2,"************************************************ OSContainers\nRemoved Spell "+ContainersSpell+" from "+PlayerRef)
 				dLog(1,"++++ NOT ENABLED ++++")
 			endif
 		endif
@@ -170,11 +188,9 @@ Function TimerTrap()
 	CancelTimer(ShortTimerID)
 	Debug.OpenUserLog(OSLogName)
 	GetMCMSettings()
-	GameGetPlayer = Game.GetPlayer()
 ;try to keep it AAF friendly, but not dependant...
-	UseAAF = False
-	If Game.IsPluginInstalled("AAF.ESM")
-		dLog(1,"Updating AAF Forms")
+	If Game.IsPluginInstalled("AAF.ESM") && !UseAAF
+		dLog(1,"Checking for and adding AAF Forms")
 		AAF_ActiveActors = Game.GetFormFromFile(0x0098f4, "AAF.esm") as FormList
 		AAF_Doppelganger = Game.GetFormFromFile(0x0072E2, "AAF.esm") as ActorBase
 		AAF_EmptyOutfit = Game.GetFormFromFile(0x02b47d, "AAF.esm") as Outfit
@@ -207,7 +223,7 @@ function ScanNPCs(bool Force=False)
 			While racecounter < OSActorRaces.GetSize()
 				int i = 0
 				if OSActorRaces.GetAt(racecounter) != None
-				ObjectReference[] kActorArray = GameGetPlayer.FindAllReferencesWithKeyword(OSActorRaces.GetAt(racecounter), ScanRange)
+				ObjectReference[] kActorArray = PlayerRef.FindAllReferencesWithKeyword(OSActorRaces.GetAt(racecounter), ScanRange)
 					while i < kActorArray.Length && OSSuspend.GetValueInt() == 0
 ;						dlog(1,None+" Scanning NPCs... "+percentInt(i,kActorArray.length))
 						Actor NPC = kActorArray[i] as Actor
@@ -251,7 +267,7 @@ int Function CountParts(Bool Speak=False)
 		OutfitPartsCounter += 1
 	endwhile
 	If Speak
-		dLog(1,"=============================== "+OutfitPartsAdder+" items in outfit parts lists.")
+		dLog(1,"=== "+OutfitPartsAdder+" items in outfit parts lists. "+OSAllItems.GetSize()+ "in OSAllItems")
 	endif
 	return OutfitPartsAdder
 endfunction
@@ -290,12 +306,16 @@ Function SetOutfitFromParts(Actor NPC)
 	endif
 ;	dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" NPCSex="+NPCSex)
 ;Do BodyGen
-	If RandomBodyGen
-		dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" will do BodyGen.RegenerateMorphs")
+	If RandomBodyGen && !NPC.HasKeyword(OSBodyDone)
+		dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" will do BodyGen.RegenerateMorphs    OSBodyDone="+NPC.HasKeyword(OSBodyDone))
 		BodyGen.RegenerateMorphs(NPC, true)
+		if BodyGenOneShot
+			dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Is getting OSBodyDone from BodyGenOneShot=True")
+			NPC.AddKeyword(OSBodyDone)
+		endif
 	endif
 ;Do NewScale
-	If NPCUseScaling
+	If NPCUseScaling && !NPC.HasKeyword(OSBodyDone)
 		float NPCNewScale = 1.0
 		if NPCMinscale >= NPCMaxScale
 			NPCNewScale=NPCMinScale
@@ -379,7 +399,7 @@ Bool Function CheckEligibility(Actor NPC)
 		return False
 	endif
 ;Not changing the player
-	If NPC == GameGetPlayer
+	If NPC == PlayerRef
 ;		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is the Player")
 		return False
 	endif
@@ -408,7 +428,7 @@ Bool Function CheckEligibility(Actor NPC)
 		return False
 	endif
 ;did they/I move too far since the scan started?
-	if GameGetPlayer.GetDistance(NPC) > ScanRange
+	if PlayerRef.GetDistance(NPC) > ScanRange
 		dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is now too far away")
 		return False
 	endif
@@ -489,10 +509,12 @@ Function GetMCMSettings()
 	NoNudes = MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool
 	NoisyConsole = MCM.GetModSettingBool("OutfitShuffler", "bNoisyConsole:General") as Bool ; Step 3 is everything in this file. I'm just working my way through.
 	RandomBodyGen = MCM.GetModSettingBool("OutfitShuffler", "bRandomBodyGen:General") as Bool
+	BodyGenOneShot = MCM.GetModSettingBool("OutfitShuffler", "bBodygenOneShot:General") as Bool
 	ScanRange = MCM.GetModSettingFloat("OutfitShuffler", "fScanRange:General") as Float
 	ShortTime = MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as Float
 	LongMult = MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General") as Int
 	LogLevel = MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as Int
+	UseContainers = MCM.GetModSettingBool("OutfitShuffler", "bUseContainers:General") as Bool
 	NPCUseScaling = MCM.GetModSettingBool("OutfitShuffler", "bNPCUseScaling:General") as Bool
 	NPCMinScale = MCM.GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float
 	NPCMaxScale = MCM.GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float
@@ -534,7 +556,7 @@ Function DebugNPC()
 					Longinv += "\n   ****************INV: "+akItem+akItem.GetName()
 			i += 1
 		EndWhile
-		dLog(2,"\n\n   ********************DebugNPC()"+"\n\n   ***************Name:"+NPC+NPC.GetLeveledActorBase().GetName()+"\n   ****************Sex:"+NPC+NPC.GetLeveledActorBase().GetSex()+"\n   ***************Race:"+NPC+NPC.GetLeveledActorBase().GetRace()+"\n   *********DontChange:"+NPC+NPC.HasKeyword(DontChange)+"\n   **********IsDeleted:"+NPC+NPC.IsDeleted()+"\n   *********IsDisabled:"+NPC+NPC.IsDisabled()+"\n   ****PowerArmorCheck:"+NPC+PowerArmorCheck(NPC)+"\n   ************IsChild:"+NPC+NPC.IsChild()+"\n   *************IsDead:"+NPC+NPC.IsDead()+"\n   ***********Distance:"+NPC+GameGetPlayer.GetDistance(NPC)+"\n"+longinv+"\n");;;;;; This whole contrivance, is vanity.
+		dLog(2,"\n\n   ********************DebugNPC()"+"\n\n   ***************Name:"+NPC+NPC.GetLeveledActorBase().GetName()+"\n   ****************Sex:"+NPC+NPC.GetLeveledActorBase().GetSex()+"\n   ***************Race:"+NPC+NPC.GetLeveledActorBase().GetRace()+"\n   *********DontChange:"+NPC+NPC.HasKeyword(DontChange)+"\n   *********OSBodyDone:"+NPC+NPC.HasKeyword(OSBodyDone)+"\n   **********IsDeleted:"+NPC+NPC.IsDeleted()+"\n   *********IsDisabled:"+NPC+NPC.IsDisabled()+"\n   ****PowerArmorCheck:"+NPC+PowerArmorCheck(NPC)+"\n   ************IsChild:"+NPC+NPC.IsChild()+"\n   *************IsDead:"+NPC+NPC.IsDead()+"\n   ***********Distance:"+NPC+PlayerRef.GetDistance(NPC)+"\n"+longinv+"\n");;;;;; This whole contrivance, is vanity.
 		If FactionsToIgnore.GetSize()
 			i=0;I moved the inventory function above this, fixed the 'Int i' up there, but forgot to fix this line from 'Int i.' That tripped me up for about two minutes. Also corrected a minor type in dlog(.
 			While i<FactionsToIgnore.GetSize()
@@ -615,6 +637,7 @@ Function RescanOutfitsINI()
 	int counter=0
 
 ;clear parts lists
+	OSAllItems.Revert()
 	While counter < PForm.Length
 		dLog(3,PercentInt(counter, PForm.Length)+" Reverting =>"+PString[Counter]+"<==  "+PForm[counter]+" Chance="+PChance[counter]+" Count="+PForm[counter].GetSize())
 		PForm[counter].revert()
@@ -635,38 +658,83 @@ Function RescanOutfitsINI()
 	endwhile
 	
 ;Get Races
+;	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "Races")
+;	Var[] RaceKeys=Utility.VarToVarArray(ConfigOptions[0])
+;	Var[] RaceValues=Utility.VarToVarArray(ConfigOptions[1])
+;	j=0
+;	OSActorRaces.Revert()
+;	While j<RaceKeys.Length
+;		int ConfigOptionsInt=RaceValues[j] as int
+;		if ConfigOptionsInt > 0
+;			dLog(3,Game.GetFormFromFile(ConfigOptionsInt, RaceKeys[j])+" Added to Races")
+;			OSActorRaces.AddForm(Game.GetFormFromFile(ConfigOptionsInt,RaceKeys[j]))
+;		endif
+;	j += 1
+;	endwhile
+
+;Get Races; Updated to Understand Hex
 	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "Races")
 	Var[] RaceKeys=Utility.VarToVarArray(ConfigOptions[0])
 	Var[] RaceValues=Utility.VarToVarArray(ConfigOptions[1])
 	j=0
 	OSActorRaces.Revert()
+	int FormToAdd
 	While j<RaceKeys.Length
-		int ConfigOptionsInt=RaceValues[j] as int
-		if ConfigOptionsInt > 0
-			dLog(3,Game.GetFormFromFile(ConfigOptionsInt, RaceKeys[j])+" Added to Races")
-			OSActorRaces.AddForm(Game.GetFormFromFile(ConfigOptionsInt,RaceKeys[j]))
+		if LL_FourPlay.StringFind(RaceValues[j],"0x")>-1
+			string[] FormToAddLeft=LL_FourPlay.StringSplit(RaceValues[j],";")
+			string[] FormToAddHex=LL_FourPlay.StringSplit(FormToAddLeft[0],"x")
+			FormToAdd=LL_FourPlay.HexStringToInt("0x"+FormToAddHex[1]) as Int
+		else
+			FormToAdd=RaceValues[j] as int
+		endif
+		if FormToAdd > 0
+			dLog(3,Game.GetFormFromFile(FormToAdd, RaceKeys[j])+" Added to Races")
+			OSActorRaces.AddForm(Game.GetFormFromFile(FormToAdd,RaceKeys[j]))
 		endif
 	j += 1
 	endwhile
-	
+
 ;Get FactionsToIgnore
-	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "FactionsToIgnore")
-	If ConfigOptions
-		Var[] FactionsToIgnoreKeys=Utility.VarToVarArray(ConfigOptions[0])
-		Var[] FactionsToIgnoreValues=Utility.VarToVarArray(ConfigOptions[1])
-		j=0
-		FactionsToIgnore.Revert()
-		While j<FactionsToIgnoreKeys.Length
-			int ConfigOptionsInt=FactionsToIgnoreValues[j] as int
-			if ConfigOptionsInt > 0
-				dLog(3,Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j])+" Added to FactionsToIgnore")
-				FactionsToIgnore.AddForm(Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j]))
-			endif
-		j += 1
-		endwhile
-	else
-		dLog(3,"*** No FactionsToIgnore ***")
-	endif
+;	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "FactionsToIgnore")
+;	If ConfigOptions
+;		Var[] FactionsToIgnoreKeys=Utility.VarToVarArray(ConfigOptions[0])
+;		Var[] FactionsToIgnoreValues=Utility.VarToVarArray(ConfigOptions[1])
+;		j=0
+;		FactionsToIgnore.Revert()
+;		While j<FactionsToIgnoreKeys.Length
+;			int ConfigOptionsInt=FactionsToIgnoreValues[j] as int
+;			if ConfigOptionsInt > 0
+;				dLog(3,Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j])+" Added to FactionsToIgnore")
+;				FactionsToIgnore.AddForm(Game.GetFormFromFile(ConfigOptionsInt, FactionsToIgnoreKeys[j]))
+;			endif
+;		j += 1
+;		endwhile
+;	else
+;		dLog(3,"*** No FactionsToIgnore ***")
+;	endif
+
+;Get FactionsToIgnore; Updated to Understand Hex
+	ConfigOptions=LL_FourPlay.GetCustomConfigOptions(MasterINI, "FactionsToIgnores")
+	Var[] FactionsToIgnoreKeys=Utility.VarToVarArray(ConfigOptions[0])
+	Var[] FactionsToIgnoreValues=Utility.VarToVarArray(ConfigOptions[1])
+	j=0
+	FactionsToIgnore.Revert()
+	FormToAdd=0
+	While j<FactionsToIgnoreKeys.Length
+		if LL_FourPlay.StringFind(FactionsToIgnoreValues[j],"0x")>-1
+			string[] FormToAddLeft=LL_FourPlay.StringSplit(FactionsToIgnoreValues[j],";")
+			string[] FormToAddHex=LL_FourPlay.StringSplit(FormToAddLeft[0],"x")
+			FormToAdd=LL_FourPlay.HexStringToInt("0x"+FormToAddHex[1]) as Int
+		else
+			FormToAdd=FactionsToIgnoreValues[j] as int
+		endif
+		if FormToAdd > 0
+			dLog(3,Game.GetFormFromFile(FormToAdd, FactionsToIgnoreKeys[j])+" Added to FactionsToIgnores")
+			FactionsToIgnore.AddForm(Game.GetFormFromFile(FormToAdd,FactionsToIgnoreKeys[j]))
+		endif
+	j += 1
+	endwhile
+
 	
 	dLog(4,"Rescanning NPCs after update")
 
@@ -713,6 +781,7 @@ Function ScanINI(String INItoCheck)
 						if FormToAdd > 0
 							If PString.Find(ChildINISections[ChildINISectionCounter]) > -1
 								PForm[PString.Find(ChildINISections[ChildINISectionCounter])].AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter]))
+								OSAllItems.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter]))
 								dLog(1,INItoCheck+" "+PercentInt(ChildKeysCounter, ChildKeys.Length)+" added "+Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter])+" from "+ChildKeys[ChildKeysCounter]+" to "+PString[PString.Find(ChildINISections[ChildINISectionCounter])]+PForm[PString.Find(ChildINISections[ChildINISectionCounter])])
 							endIf
 						endif
@@ -778,6 +847,7 @@ endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function JustEndItAll()
 	int counter=0
+	OSAllItems.Revert()
 	While counter < PForm.Length
 		PForm[counter].revert()
 		counter += 1
@@ -822,12 +892,24 @@ int Function BodyCount()
 	int CountedBodies
 	int racecounter = 0
 	While racecounter < OSActorRaces.GetSize()
-		ObjectReference[] kActorArray = GameGetPlayer.FindAllReferencesWithKeyword(OSActorRaces.GetAt(racecounter), ScanRange)
+		ObjectReference[] kActorArray = PlayerRef.FindAllReferencesWithKeyword(OSActorRaces.GetAt(racecounter), ScanRange)
 		countedbodies += kActorArray.Length
 		RaceCounter += 1
 	endwhile
 	return countedbodies
 EndFunction
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Function CountAll()
+	Int OutfitPartsCounter
+	Int OutfitPartsAdder
+	While OutfitPartsCounter < PForm.Length
+		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
+		OutfitPartsCounter += 1
+	endwhile
+	dLog(2,"======================= "+OutfitPartsAdder+" items in outfit parts lists. ======================= "+OSAllItems.GetSize()+ " in OSAllItems")
+endfunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1059,35 +1141,3 @@ Function BuildOutfitArray()
 	PChance.Add(0)
 
 endfunction
-
-
-
-
-
-
-
-; Fallout 4\Data\MCM\Config\OutfitShuffler\config.json notes. Had to remove comments. Broke Keybinds. 6.25 rel with diagnostic pre-release cleanup.
-;	{
-;      "id": "RandomBodyGen",;This function was complete was complete, before Step 0, of NPCGetHeadParts. This is Unreleased 6.24.
-;      "desc": "This changes to a random BodyGen setting, but leaves the outfit the same.",
-;	  "action": {
-;			"type": "CallFunction",
-;			"form": "OutfitShuffler.esl|0800",
-;			"function": "RandomBodyGen",
-;			"params": []
-;	  }	
-;    },
-;		{
-;      "id": "NPCGetHeadParts",;Very High. Edible. First try in game since starting this function. Incorrect id GetHeadParts. Is this actually Step 0 of this function? I've just decideded this is '6.25 rel with diagnostic', and will probably be released, for 6.24+ features, inc RandomBodyGen and Hotkey.
-;     "desc": "This prints and logs HeadParts from targeted NPC." 
-;	  "action": {
-;			"type": "CallFunction",
-;			"form": "OutfitShuffler.esl|0800",
-;			"function": "NPCGetGeadParts", ;I couldn't just call it GetHeadParts. I'm betting that would break something. This is Step 1. Step 0 info: I got it right, here.
-;			"params": []
-;	  }	
-;    }
-;This will now be the third try, in-game. Unable to set hotkeys. then I commented the RandomBodyGen code, and broke the previously working hotkey. TIL.
-;There was originally a double-backslash style comment block, that even when prefixed ';' on ever line, the last backslash broke the compiler. Papyrus Compiler Version 2.8.0.4 for Fallout 4. 6.25 rel with diagnostic pre-release cleanup, in-game test 4.
-; keybinds.json "desc": "This prints and logs HeadParts from targeted NPC."    <== See, I forgot the comma. 6.25 rel with diagnostic pre-release cleanup, in-game test 5.
-
