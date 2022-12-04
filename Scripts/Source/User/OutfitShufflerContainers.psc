@@ -14,9 +14,10 @@ String OSLogName="OutfitShuffler"
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	NoisyConsole = MCM.GetModSettingBool("OutfitShuffler", "bNoisyConsole:General") as Bool
 	if OSTempContainer.GetSize()==0
-		if OSSuspend.GetValueInt() == 0 && akSourceContainer
+		String dOut
+		if OSSuspend.GetValueInt() == 0 && akSourceContainer && (!(akSourceContainer == akSourceContainer as Actor)||((akSourceContainer == akSourceContainer as Actor)&&(akSourceContainer as Actor).IsDead()))
 			MyOnlyContainer=akSourceContainer
-			String dout="*** OSContainers Adding\n"
+			dout="*** OSContainers Adding to "+akSourceContainer+"("+(akSourceContainer as Actor)+")\n"
 			If OSAllItems.GetSize()>1
 				int i
 				While i<Utility.RandomInt(1,MCM.GetModSettingInt("OutfitShuffler", "iContainerItems:General") as Int)
@@ -28,14 +29,14 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 				endwhile
 				dout+="*** \n"+i+" items added to "+MyOnlyContainer
 			endif
-			;dLog(1,dout)
+			dLog(1,dout)
 			RegisterForDistanceGreaterThanEvent(PlayerRef, MyOnlyContainer, 1000.0)
 			AddInventoryEventFilter(None)
 		else
-			;dlog(2,"Currently in OSSuspend")
+			dout="*** OSContainers NOT Adding to "+akSourceContainer+" owned by "+akSourceContainer.GetActorOwner()+"\n"
 			AddInventoryEventFilter(None)
 		endif
-		String dout="*** OSTempContainer Formlist:\n"
+		dout="*** OSTempContainer Formlist:\n"
 		int i=0
 		While i<OSTempContainer.GetSize()
 			Form TempItem=OSTempContainer.GetAt(i)
@@ -43,7 +44,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 			i+=1
 		endwhile
 		dout+="*** \n"+i+" items in "+OSTempContainer
-		;dLog(2,dout)
+		dLog(1,dout)
 	endif
 endEvent
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -60,7 +61,7 @@ Event OnDistanceGreaterThan(ObjectReference akObj1, ObjectReference akObj2, floa
 		i+=1
 	endwhile
 	dout+="*** \n"+i+" items removed from "+MyOnlyContainer
-	;dLog(1,dout)
+	dLog(1,dout)
 	OSTempContainer.Revert()
 	UnRegisterForDistanceEvents(PlayerRef, MyOnlyContainer)
 endevent
