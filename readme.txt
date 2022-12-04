@@ -1,3 +1,5 @@
+20221203: 7.1 Now adds random amounts of random items to containers when you're looting. You rummage around in there, and sometimes something turns up.
+
 20221203: 7.0 BodyGen options now include a "BodyGen OneShot" option, that will only regenerate the NPCs once, then flag them to not change, even if their outfit does. Hotkey is available to change NPCs even if the other BodyGen options are disabled.
 [Races] and [FactionsToIgnore] in the OufitShuffler.ini, now accept regular hexadecimal values. 0x123456 <== Is the correct format to use.
 MCM Readme.txt is in Data\MCM\Config\OutfitShuffler\ in the 7z, and in the root of the repo at https://github.com/tzenrick/FO4OutfitShuffler/blob/main/MCM%20Readme.txt
