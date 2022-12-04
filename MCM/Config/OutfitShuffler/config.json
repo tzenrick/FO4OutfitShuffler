@@ -55,8 +55,31 @@
 			}
 		},
 		{
-			"text": "<br>",
-			"html": true
+			"text": "Loot Options",
+			"type": "section"
+		},
+		{"text": "Outfit pieces in containers?",
+			"help": "Allow random outfit pieces in containers.",
+			"type": "switcher",
+			"id": "bUseContainers:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
+		},
+		{"text": "    Maximum random container items",
+			"help": "Puts new people in the scan range into new outfits.",
+			"type": "slider",
+			"id": "iContainerItems:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 1,
+				"max": 60,
+				"step": 1
+			}
+		},
+		{
+			"text": "Shuffling Options",
+			"type": "section"
 		},
 		{
 			"text": "Enable OneShot",
@@ -86,8 +109,13 @@
 			}
 		},
 		{
-			"text": "<br>",
-			"html": true
+			"text": "Enable OneShot for BodyGen",
+			"help": "Change NPC BodyGen once, but not again without user action.",
+			"type": "switcher",
+			"id": "bBodygenOneShot:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
+			}
 		},
 		{
 			"text": "Random Body Resizes",
@@ -123,23 +151,6 @@
 			}
 		},
 		{
-			"text": "<br>",
-			"html": true
-		},
-		{
-			"text": "Allow Base/DLC outfits?",
-			"help": "Allow Base Game and DLC outfit items to be worn.",
-			"type": "switcher",
-			"id": "bAllowDLC:General",
-			"valueOptions": {
-				"sourceType": "ModSettingBool"
-			}
-		},
-		{
-			"text": "<br>",
-			"html": true
-		},
-		{
 			"text": "Scanning",
 			"type": "section"
 		},
@@ -155,7 +166,7 @@
 				"step": 250.0
 			}
 		},
-				{
+		{
 			"text": "Timers and Counters",
 			"type": "section"
 		},
@@ -182,10 +193,6 @@
 				"max": 1111,
 				"step": 1
 			}
-		},
-		{
-			"text": "<br>",
-			"html": true
 		},
 		{
 			"text": "Hotkeys",
@@ -237,10 +244,6 @@
 			}
 		},
 		{
-			"text": "<br>",
-			"html": true
-		},
-		{
 			"text": "Logging",
 			"type": "section"
 		},
@@ -266,8 +269,8 @@
 			}
 		},
 		{
-			"text": "<br>",
-			"html": true
+			"text": "Weapons and Base/DLC outfits",
+			"type": "section"
 		},
 		{
 			"text": "Weapons",
@@ -279,6 +282,15 @@
 				"min": 0,
 				"max": 100,
 				"step": 1
+			}
+		},
+		{
+			"text": "Allow Base/DLC outfits?",
+			"help": "Allow Base Game and DLC outfit items to be worn.",
+			"type": "switcher",
+			"id": "bAllowDLC:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
 			}
 		},
 		{
