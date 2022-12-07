@@ -1,3 +1,5 @@
+20221206: 7.2 Container management is much cleaner now. It's SUPPOSED to ignore the container used by Dave's In-Game ESP Explorer, now. I added rudimentary Devious Devices Support. I also added in a NoNudes option. It should be more agressive at keeping some sort of clothing on the NPC's, unless they've been hit with the DontChange keyword. ** It is recommended by the authors, and other users, that Devious Devices and NPCs don't mix well. I tried.
+
 20221203: 7.1 Now adds random amounts of random items to containers when you're looting. You rummage around in there, and sometimes something turns up.
 
 20221203: 7.0 BodyGen options now include a "BodyGen OneShot" option, that will only regenerate the NPCs once, then flag them to not change, even if their outfit does. Hotkey is available to change NPCs even if the other BodyGen options are disabled.
