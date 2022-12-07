@@ -3,21 +3,24 @@ Scriptname OutfitShufflerContainers extends ActiveMagicEffect
 GlobalVariable Property OSSuspend Auto
 Formlist Property OSAllItems Auto
 Actor Property PlayerRef Auto Const
-Bool NoisyConsole = True
 ObjectReference MyOnlyContainer
 FormList Property OSTempContainer Auto
-int LogLevel=1
 String OSLogName="OutfitShuffler"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-	NoisyConsole = MCM.GetModSettingBool("OutfitShuffler", "bNoisyConsole:General") as Bool
-	if OSTempContainer.GetSize()==0
+	Bool ESPContainer
+	If Game.IsPluginInstalled("ESPExplorerFO4.esp")
+		if akSourceContainer==Game.GetFormFromFile(0x1742,"ESPExplorerFO4.esp") as ObjectReference
+			ESPContainer=True
+		endif
+	endif
+	if akSourceContainer && OSSuspend.GetValueInt() == 0 && !ESPContainer && OSTempContainer.GetSize()==0
 		String dOut
-		if OSSuspend.GetValueInt() == 0 && akSourceContainer && (!(akSourceContainer == akSourceContainer as Actor)||((akSourceContainer == akSourceContainer as Actor)&&(akSourceContainer as Actor).IsDead()))
+		if !(akSourceContainer == akSourceContainer as Actor)||((akSourceContainer == akSourceContainer as Actor)&&(akSourceContainer as Actor).IsDead())
 			MyOnlyContainer=akSourceContainer
-			dout="*** OSContainers Adding to "+akSourceContainer+"("+(akSourceContainer as Actor)+")\n"
+			dout="OSContainers Adding to "+akSourceContainer+"("+(akSourceContainer as Actor)+")\n"
 			If OSAllItems.GetSize()>1
 				int i
 				While i<Utility.RandomInt(1,MCM.GetModSettingInt("OutfitShuffler", "iContainerItems:General") as Int)
@@ -27,23 +30,23 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 					MyOnlyContainer.AddItem(TempItem)
 					i+=1
 				endwhile
-				dout+="*** \n"+i+" items added to "+MyOnlyContainer
+				dout+="\n"+i+" items added to "+MyOnlyContainer
 			endif
 			dLog(1,dout)
 			RegisterForDistanceGreaterThanEvent(PlayerRef, MyOnlyContainer, 1000.0)
 			AddInventoryEventFilter(None)
 		else
-			dout="*** OSContainers NOT Adding to "+akSourceContainer+" owned by "+akSourceContainer.GetActorOwner()+"\n"
+			dout="OSContainers NOT Adding to "+akSourceContainer+"("+(akSourceContainer as Actor)+")\n"
 			AddInventoryEventFilter(None)
 		endif
-		dout="*** OSTempContainer Formlist:\n"
+		dout="OSTempContainer Formlist:\n"
 		int i=0
 		While i<OSTempContainer.GetSize()
 			Form TempItem=OSTempContainer.GetAt(i)
 			dout+=TempItem+"\n"
 			i+=1
 		endwhile
-		dout+="*** \n"+i+" items in "+OSTempContainer
+		dout+="\n"+i+" items in "+OSTempContainer
 		dLog(1,dout)
 	endif
 endEvent
@@ -51,8 +54,7 @@ endEvent
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnDistanceGreaterThan(ObjectReference akObj1, ObjectReference akObj2, float afDistance)
-	NoisyConsole = MCM.GetModSettingBool("OutfitShuffler", "bNoisyConsole:General") as Bool
-	String dout="*** OSContainers Removing\n"
+	String dout="OSContainers Removing\n"
 	int i=0
 	While i<OSTempContainer.GetSize()
 		Form TempItem=OSTempContainer.GetAt(i)
@@ -60,7 +62,7 @@ Event OnDistanceGreaterThan(ObjectReference akObj1, ObjectReference akObj2, floa
 		MyOnlyContainer.RemoveItem(TempItem, 1)
 		i+=1
 	endwhile
-	dout+="*** \n"+i+" items removed from "+MyOnlyContainer
+	dout+="\n"+i+" items removed from "+MyOnlyContainer
 	dLog(1,dout)
 	OSTempContainer.Revert()
 	UnRegisterForDistanceEvents(PlayerRef, MyOnlyContainer)
@@ -75,6 +77,8 @@ EndEvent
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function dLog(int dLogLevel,string LogMe); 6.25 Implementing Leveled Logging. Sloppily.
+	bool NoisyConsole = MCM.GetModSettingBool("OutfitShuffler", "bNoisyConsole:General") as Bool
+	int LogLevel = MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int
 ;File Output
 	If LogLevel == 0 && dLogLevel == 1
 		;debug.TraceUser(OSLogName, "[..Shuffler]"+LogMe)
