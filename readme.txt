@@ -1,3 +1,7 @@
+20221217: 7.3 It took some banging, but DD should be much safer to use. I would HIGHLY recommend using the OneShot option available in the Mod Configuration Menu.
+
+7.3a TOOOOOTALLY ALPHA TRASH! Absolute shitshow. Never released.
+
 20221206: 7.2 Container management is much cleaner now. It's SUPPOSED to ignore the container used by Dave's In-Game ESP Explorer, now. I added rudimentary Devious Devices Support. I also added in a NoNudes option. It should be more aggressive at keeping some sort of clothing on the NPC's, unless they've been hit with the DontChange keyword. ** It is recommended by the authors, and other users, that Devious Devices and NPCs don't mix well. I tried.
 
 20221203: 7.1 Now adds random amounts of random items to containers when you're looting. You rummage around in there, and sometimes something turns up.
