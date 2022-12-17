@@ -4,7 +4,7 @@
 	"minMcmVersion": 1,
 	"content": [
 		{
-			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>vWhatever. I can't keep up right now.</font>",
+			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v7.3</font>",
 			"type": "text",
 			"html": true
 		},
@@ -21,6 +21,76 @@
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|0800",
 			"function": "RescanOutfitsINI"
+			}
+		},
+		{
+			"text": "Change Items",
+			"type": "section"
+		},
+		{
+			"id": "DontChangeItem:Global",
+			"text": "DontChange Item",
+			"type": "button",
+			"help": "Add 25 DontChange items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddDontChangeItem"
+			}
+		},
+		{
+			"id": "AlwaysChangeItem:Global",
+			"text": "AlwaysChange Item",
+			"type": "button",
+			"help": "Add 25 AlwaysChange items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddAlwaysChangeItem"
+			}
+		},
+		{
+			"id": "DontBodyGenItem:Global",
+			"text": "DontBodyGen Item",
+			"type": "button",
+			"help": "Add 25 DontBodyGen items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddDontBodyGenItem"
+			}
+		},
+		{
+			"id": "AlwaysBodyGenItem:Global",
+			"text": "AlwaysBodyGen Item",
+			"type": "button",
+			"help": "Add 25 AlwaysBodyGen items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddAlwaysBodyGenItem"
+			}
+		},
+		{
+			"id": "DontScaleItem:Global",
+			"text": "DontScale Item",
+			"type": "button",
+			"help": "Add 25 DontScale items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddDontScaleItem"
+			}
+		},
+		{
+			"id": "AlwaysScaleItem:Global",
+			"text": "AlwaysScale Item",
+			"type": "button",
+			"help": "Add 25 AlwaysScale items to player inventory.",
+			"action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "AddAlwaysScaleItem"
 			}
 		},
 		{
@@ -58,7 +128,7 @@
 			"text": "Loot Options",
 			"type": "section"
 		},
-		{"text": "Outfit pieces in containers?",
+		{"text": "Allow container loot.",
 			"help": "Allow random outfit pieces in containers.",
 			"type": "switcher",
 			"id": "bUseContainers:General",
@@ -67,7 +137,7 @@
 			}
 		},
 		{"text": "    Maximum random container items",
-			"help": "Puts new people in the scan range into new outfits.",
+			"help": "Random loot items up to this amount.",
 			"type": "slider",
 			"id": "iContainerItems:General",
 			"valueOptions": {
@@ -75,6 +145,14 @@
 				"min": 1,
 				"max": 60,
 				"step": 1
+			}
+		},
+		{"text": "    Allow Dead Body loot.",
+			"help": "Allow random outfit pieces in dead bodies loot.",
+			"type": "switcher",
+			"id": "bLootTheDead:General",
+			"valueOptions": {
+				"sourceType": "ModSettingBool"
 			}
 		},
 		{
@@ -190,7 +268,7 @@
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 5,
-				"max": 1111,
+				"max": 1000,
 				"step": 1
 			}
 		},
@@ -249,23 +327,14 @@
 		},
 		{
 			"text": "Logging Level",
-			"help": "0=Off, 1=To Papyrus",
+			"help": "0=Off, 1=To Papyrus, 2=Papyrus and Console",
 			"type": "slider",
 			"id": "iLogLevel:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
-				"max": 1,
+				"max": 2,
 				"step": 1
-			}
-		},
-		{
-			"text": "Log to console",
-			"help": "Mirror logging output to Console",
-			"type": "switcher",
-			"id": "bNoisyConsole:General",
-			"valueOptions": {
-				"sourceType": "ModSettingBool"
 			}
 		},
 		{

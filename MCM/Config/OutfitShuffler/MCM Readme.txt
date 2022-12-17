@@ -1,97 +1,52 @@
-Rescan
-	Rescan Rechecks Data\F4SE\Plugins\OutfitShuffler.ini updates options and rescans all of the INI files in the [INIFiles] section.
+OutfitShuffler Mod Configuration Menu Options
 
-General Settings
-	Enable Outfit Shuffling
-		Enable or disable this mod.
+OutfitShuffler is a Fallout 4 mod that randomly shuffles the outfits of NPCs in the game. It allows you to customize the chances of certain outfit pieces appearing, and also allows you to add random weapons, bodygen and scale changes.
 
-	Enable Females
-		Enable or disable changing female NPCs.
+## Configuration
+OutfitShuffler has a Mod Configuration Menu with several options to customize the outfit shuffling.
 
-	Enable Males
-		Enable or disable changing male NPCs.
-Loot
-	Allow container loot.
-		Allow random outfit pieces in containers.
-	
-	Maximum random container items",
-		Random loot items up to this amount.
+### Rescan
+This option allows you to rescan all outfit configs from disk. Close the menu after toggling to update.
 
-Shuffling Options
-	Enable OneShot
-		Change NPC's once but not again without user action.
+### Change Items
+This option allows you to add 25 of each of the following types of items to the player's inventory:
 
-	Keep Clothes On
-		Attempt to force clothes onto naked people.
+* DontChange Item
+* AlwaysChange Item
+* DontBodyGen Item
+* AlwaysBodyGen Item
+* DontScale Item
+* AlwaysScale Item
 
-	Enable random BodyGen
-		Shuffle BodyGen when Outfit Shuffles.
+### General Settings
+This option allows you to enable or disable the mod, enable or disable changing female and male NPCs, and allow or disallow container loot.
 
-	BodyGen OneShot
-		Change NPC BodyGen once, but not again without user action.
+### Loot Options
+This option allows you to enable or disable finding outfit pieces as loot in containers and on bodies, as well as set a maximum number of random container items and allow or disallow random outfit pieces in.
 
-	Random Body Resizes
-		Change NPC Scale when changing outfits.
+### Shuffling Options
+This option allows you to enable OneShot, Keep Clothes On, enable random BodyGen, enable OneShot for BodyGen, and random Body Resizes.
 
-	Minimum size to scale
-		Minimum size to scale NPC to. (Recommend 0.8 minimum)
+### Scanning
+This option allows you to set the scanning distance.
 
-	Maximum size to scale
-		Maximum size to scale NPC to. (Recommend 1.3 maximum)
+### Timers and Counters
+This option allows you to set the short timer and the multiplier.
 
+### Hotkeys
+This option allows you to set hotkeys for ChangeNow, UpdateAllOutfits, DontChange, DebugNPC, and RandomBodyGen.
 
-Scanning
+### Logging
+This option allows you to set the logging level.
 
-	Scanning Distance
-		How many units away to scan.
+### Weapons and Base/DLC outfits
+This option allows you to set the chance of new weapons from a WeaponsList.ini file, as well as allow Base/DLC outfits.
 
-	Timers and Counters
+### Chances of female and male outfit parts
+This option allows you to set the chances for the following female and male outfit parts: Hair, Top, Bottom, Shoes, FullBody, and ArmAddons.
 
-		Short Timer
-			Puts new people in the scan range into new outfits. Short Timer is the delay in seconds between the end of one scan, and the start of the next.
+### Uninstall
+This option clears the formlists and stops the OutfitShuffler Control Quest. It DOES NOT RESET OUTFITS and requires a reinstall.
 
-		Multiplier
-			How many times the Short Timer runs, before changing everyone eligible.
-
-Hotkeys
-
-	ChangeNow
-		Changes the outfit on the targeted NPC as soon as possible.
-		This shuffles one NPC.
-
-	UpdateAllOutfits
-		Shuffle All Outfits on Next Short Timer
-		This shuffles everything.
-
-	DontChange
-		Toggle Ignore this NPC/Ignore Faction exclusion
-		This toggles AlwaysChange DontChange or default changing behavior.
-
-	DebugNPC
-		Output Debug Information for NPC
-		Output NPC Status
-
-	RandomBodyGen
-		Change to a random BodyGen.
-		Change targeted NPC to a random bodygen without changing the outfit.
-
-Logging
-
-	Logging Level
-		0=Off 1=To Papyrus
-
-	Log to console
-		Mirror logging output to Console
-
-Weapons and Base/DLC outfits
-	Weapons
-		Chance of New Weapons from Data/F4SE/Plugins/OutfitShuffler/WeaponsList.ini.
-	Allow Base/DLC outfits?
-		Allow Base Game and DLC outfit items to be worn. This is not recommended.
-	
-Chances of female outfit parts/Chances of female outfit parts
-
-	Full Body
-	Chance of Full Body Suit instead of building from Parts.
-
-	Other options indicate the chances that different categories of items from the INI files, will be placed onto males or females, accordingly.
+### Restart from OnInit()
+This option restarts the mod from OnInit. It attempts to reset all formlists and reload all data. 95% of this is accomplished in "Rescan Outfits" and should be used as a last result before removing the mod, loading the game without the mod, saving the game without the mod, and reinstalling the mod.
