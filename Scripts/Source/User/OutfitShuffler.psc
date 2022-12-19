@@ -112,6 +112,7 @@ int TimeID = 888
 int MultCounter = 0
 int RaceCounter
 int CountActors
+String ActorsList
 
 ;Arrays
 FormList[] PForm
@@ -220,6 +221,9 @@ Event OnTimer(int aiTimerID)
 				float TimerStart=Utility.GetCurrentRealTime()
 				TimerTrap()
 				dlog(1,"TimerTrap("+MultCounter+") run in "+(Utility.GetCurrentRealTime()-TimerStart)+" seconds. "+CountActors+" NPCs changed.")
+				if CountActors
+					dlog(1,"NPCs Processed:"+ActorsList)
+				endif
 			else
 				UnRegisterForPlayerTeleport()
 				PlayerRef.RemoveSpell(ContainersSpell)
@@ -249,23 +253,41 @@ function ScanNPCs(bool Force=False)
 	if OSSuspend.GetValueInt() == 0 && CountParts()>1
 		CountActors = 0
 		RaceCounter = 0
+		ActorsList = ""
 		While RaceCounter < OSActorRaces.GetSize()
 			int iActorArray = 0
 			if OSActorRaces.GetAt(RaceCounter) != None
 				kActorArray = PlayerRef.FindAllReferencesWithKeyword(OSActorRaces.GetAt(RaceCounter), (MCM.GetModSettingFloat("OutfitShuffler", "fScanRange:General") as Float))
 				while iActorArray < kActorArray.Length && OSSuspend.GetValueInt() == 0
-					
 					Actor NPC = kActorArray[iActorArray] as Actor
-					;dLog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is being checked...")
 					If NPC != PlayerRef
 						int MaintTimer=(NPC.GetValue(OSMaintTime) as Int)+((MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as int)*(MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General")) as Int)
-						NPC.RemoveSpell(Maintainer)
-						if CheckEligibility(NPC)
-							if (((Utility.GetCurrentRealTime()as Int)>MaintTimer) || ((Utility.GetCurrentRealTime() as Int)>NPC.GetValue(OSMaintTime)))&&NPC.GetItemCount(OSDontChangeItem)
-								utility.wait(utility.randomint(1,3))
-								dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is doing Spell Reset")
-								NPC.AddSpell(Maintainer)
+;lets try it here.
+						if CheckEligibility(NPC, PreCheck=True)
+							Form []InvItems = NPC.GetInventoryItems()
+							int iArmorCheck=0
+							int ArmorItems
+							int iArmorLoop
+							While (iArmorLoop < InvItems.Length)
+								Form akItem = InvItems[iArmorLoop]
+									;dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Item="+akItem+akitem.getname()+" IsEquipped="+NPC.IsEquipped(akItem))
+									If (akItem as Armor)!=None && NPC.IsEquipped(akItem)
+										ArmorItems+=1
+									endif
+								iArmorLoop += 1
+							EndWhile
+							If ArmorItems<2 && (MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool)
+								CleanMe(NPC)
 							endif
+						endif
+						
+						if CheckEligibility(NPC)
+;							if (((Utility.GetCurrentRealTime()as Int)>MaintTimer) || ((Utility.GetCurrentRealTime() as Int)>NPC.GetValue(OSMaintTime)))&&NPC.GetItemCount(OSDontChangeItem)
+;								NPC.RemoveSpell(Maintainer)
+;								utility.wait(Utility.RandomFloat(0.5,2.0))
+;								dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is doing Spell Reset")
+;								NPC.AddSpell(Maintainer)
+;							endif
 							string ddlog="\n"+NPC+NPC.GetLeveledActorBase().GetName()+"   ********OSMaintWait="+NPC.Getvalue(OSMaintWait)
 							if (MaintTimer<(Utility.GetCurrentRealTime() as Int))
 								ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+"   *******OSMaintTime+="+MaintTimer
@@ -274,6 +296,7 @@ function ScanNPCs(bool Force=False)
 								ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" needs an outfit"
 								dlog(1,ddlog)
 								;SetOutfitFromParts(NPC)
+								NPC.RemoveSpell(Maintainer)
 								Var[] params = new Var[1]
 								params[0] = NPC
 								Self.CallFunction("SetOutfitFromParts",params)
@@ -283,6 +306,7 @@ function ScanNPCs(bool Force=False)
 								ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" needs an outfit"
 								dlog(1,ddlog)
 								;SetOutfitFromParts(NPC)
+								NPC.RemoveSpell(Maintainer)
 								Var[] params = new Var[1]
 								params[0] = NPC
 								Self.CallFunction("SetOutfitFromParts",params)
@@ -292,21 +316,23 @@ function ScanNPCs(bool Force=False)
 								ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" needs an outfit"
 								dlog(1,ddlog)
 								;SetOutfitFromParts(NPC)
+								NPC.RemoveSpell(Maintainer)
 								Var[] params = new Var[1]
 								params[0] = NPC
 								Self.CallFunction("SetOutfitFromParts",params)
 							endif
 						endif
+						
 						If NPC.GetLeveledActorBase().Getoutfit()==ForceChangeOutfit
 							NPC.SetValue(OSMaintWait,1)
 							dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" has ForceChangeOutfit")
 							;SetOutfitFromParts(NPC)
+							NPC.RemoveSpell(Maintainer)
 							Var[] params = new Var[1]
 							params[0] = NPC
 							Self.CallFunction("SetOutfitFromParts",params)
 						endif
 					endif
-					
 				iActorArray+=1
 				endwhile
 			endif
@@ -315,6 +341,171 @@ function ScanNPCs(bool Force=False)
 	endif
 	StartTimer((MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as Float), TimeID)
 endFunction
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Function CleanMe(Actor NPC)
+	Form[] InvItems = NPC.GetInventoryItems()
+	FormList SafeForm
+	If NPC.GetLeveledActorBase().GetSex()==0
+		SafeForm = XYSafeItems
+	endif
+	If NPC.GetLeveledActorBase().GetSex()==1
+		SafeForm = XXSafeItems
+	endif
+	Bool WearingDD
+	int i
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		If (akItem as Armor) && (!OSAllItems.HasForm(akItem as ObjectReference) || !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference)) && (0<akItem.getformid() && akItem.getformid()<0x07000000) && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
+			NPC.removeitem(akItem,-1)
+			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" removed")
+		endif
+	i += 1
+	EndWhile
+
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
+			NPC.equipitem(akItem)
+			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped")
+		endif
+	i += 1
+	endwhile
+
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		if SafeForm.HasForm(akItem as ObjectReference)
+			NPC.EquipItem(akItem)
+			endif
+	i += 1
+	endwhile
+
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i] as Armor
+		if akItem!=None
+			if (OSUseDD.GetValueInt()>0) &&\
+			(akItem.HasKeyword(DDRendered)||\
+			(akItem.HasKeyword(DDInventory)))
+				if NPC.IsEquipped(akItem)
+					WearingDD=True
+				else
+					WearingDD=True
+							npc.equipitem(akItem)
+				endif
+			endif
+		endif
+		i += 1
+	endwhile
+	
+	if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0
+		NPC.AddItem(OSDontChangeItem,1,true)
+	endif
+	Utility.Wait(Utility.RandomFloat(0.5,2.0))
+	i=0
+
+	InvItems = NPC.GetInventoryItems()
+	While (i < InvItems.Length) && NPC.GetItemCount(OSDontChangeItem)==0
+		Form akItem = InvItems[i]
+		If (akItem as Armor)
+			if !NPC.IsEquipped(akItem)
+				NPC.RemoveItem(akItem, -1)
+			endif
+		endif
+	i += 1
+	EndWhile
+
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	int ArmorItems
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+			If (akItem as Armor)!=None && NPC.IsEquipped(akItem)
+				ArmorItems+=1
+			endif
+		i += 1
+	EndWhile	
+
+	if NPC.GetItemCount(OSDontChangeItem)==0 && ArmorItems<2 && (MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool)
+		NPC.SetOutfit(ForceChangeOutfit)
+		NPC.SetValue(OSMaintWait,0)
+		return
+	endif
+
+	if (MCM.GetModSettingBool("OutfitShuffler", "bOneShot:General") as Bool==1) && NPC.GetItemCount(OSDontChangeItem)<1
+		NPC.AddItem(OSDontChangeItem,1)
+	endif
+
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		If (akItem as Armor) && (!OSAllItems.HasForm(akItem as ObjectReference) || !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference)) && (0<akItem.getformid() && akItem.getformid()<0x07000000) && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
+			NPC.removeitem(akItem,-1)
+		endif
+	i += 1
+	EndWhile
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
+			NPC.equipitem(akItem)
+		endif
+	i += 1
+	endwhile
+
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		if SafeForm.HasForm(akItem as ObjectReference)
+			NPC.EquipItem(akItem)
+			endif
+	i += 1
+	endwhile
+	InvItems = NPC.GetInventoryItems()
+	i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i] as Armor
+		if akItem!=None
+			if (OSUseDD.GetValueInt()>0) &&\
+			(akItem.HasKeyword(DDRendered)||\
+			(akItem.HasKeyword(DDInventory)))
+				if NPC.IsEquipped(akItem)
+					WearingDD=True
+				else
+					WearingDD=True
+					npc.equipitem(akItem)
+				endif
+			endif
+		endif
+		i += 1
+	endwhile
+	if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0
+		NPC.AddItem(OSDontChangeItem,1,true)
+	endif
+	InvItems = NPC.GetInventoryItems()
+	int iArmorCheck=0
+	ArmorItems=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Item="+akItem+akitem.getname()+" IsEquipped="+NPC.IsEquipped(akItem))
+			If (akItem as Armor)!=None && NPC.IsEquipped(akItem)
+				ArmorItems+=1
+			endif
+		i += 1
+	EndWhile
+	If ArmorItems<2
+		NPC.SetOutfit(ForceChangeOutfit)
+	endif
+	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" requipped "+armoritems+" items")
+Endfunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -429,97 +620,11 @@ Function SetOutfitFromParts(Actor NPC)
 		NPC.EquipItem(RandomItem)
 	endif
 
-	utility.wait(utility.RandomFloat(0.5,2.0))
 ;Clean up the mess
+	CleanMe(NPC)
+
 	Form[] InvItems = NPC.GetInventoryItems()
-	Bool WearingDD
-	int i
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting Base/DLC Items Removal")
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i]
-		If (akItem as Armor) && (!OSAllItems.HasForm(akItem as ObjectReference) || !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference)) && (0<akItem.getformid() && akItem.getformid()<0x07000000) && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
-			NPC.removeitem(akItem,-1)
-			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" removed")
-		endif
-	i += 1
-	EndWhile
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Finished Base/DLC Items Removal")
-
-	InvItems = NPC.GetInventoryItems()
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting Regular Items Equipping")
-	i=0
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i]
-		If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
-			NPC.equipitem(akItem)
-			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped")
-		endif
-	i += 1
-	endwhile
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Finished Regular Items Equipping")
-
-	InvItems = NPC.GetInventoryItems()
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting SafeItems Equipping")
-	i=0
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i]
-		if SafeForm.HasForm(akItem as ObjectReference)
-			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" is in SafeItems")
-			NPC.EquipItem(akItem)
-			endif
-	i += 1
-	endwhile
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Finished SafeItems Equipping")
-
-	InvItems = NPC.GetInventoryItems()
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting Devious Devices Equipping")
-	i=0
-	While (i < InvItems.Length)
-		Form akItem = InvItems[i] as Armor
-		if akItem!=None
-			if (OSUseDD.GetValueInt()>0) &&\
-			(akItem.HasKeyword(DDRendered)||\
-			(akItem.HasKeyword(DDInventory)))
-				if NPC.IsEquipped(akItem)
-					WearingDD=True
-							dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" is wearing DD="+akItem+akItem.GetName())
-				else
-					WearingDD=True
-							npc.equipitem(akItem)
-					dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" FORCE equipped DD="+akItem+akItem.GetName())
-				endif
-			endif
-		endif
-		i += 1
-	endwhile
-	
-	if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0
-		NPC.AddItem(OSDontChangeItem,1,true)
-		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" DontChange added because of DD.")
-	endif
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Finished Devious Devices Equipping")
-	Utility.Wait(Utility.RandomFloat(0.5,2.0))
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting Removing Extra Items")
-	i=0
-
-	InvItems = NPC.GetInventoryItems()
-	While (i < InvItems.Length) && NPC.GetItemCount(OSDontChangeItem)==0
-		Form akItem = InvItems[i]
-		If (akItem as Armor)
-			if !NPC.IsEquipped(akItem)
-					dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" removed conflict item "+akItem+akItem.GetName())
-				NPC.RemoveItem(akItem, -1)
-			endif
-		endif
-	i += 1
-	EndWhile
-
-	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Finished Removing Extra Items")
-	
-	Utility.Wait(Utility.RandomFloat(0.5,2.0))
-
-	InvItems = NPC.GetInventoryItems()
-	i=0
+	int i=0
 	int ArmorItems
 	While (i < InvItems.Length)
 		Form akItem = InvItems[i]
@@ -532,7 +637,7 @@ Function SetOutfitFromParts(Actor NPC)
 
 	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" has "+ArmorItems+" ArmorItems. NoNudes="+(MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool))
 
-	if NPC.GetItemCount(OSDontChangeItem)==0 && ArmorItems==0 && (MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool)
+	if NPC.GetItemCount(OSDontChangeItem)==0 && ArmorItems<2 && (MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool)
 		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" not enough armor in inventory("+ArmorItems+"), resetting outfit.")
 		NPC.SetOutfit(ForceChangeOutfit)
 		NPC.SetValue(OSMaintWait,0)
@@ -546,6 +651,7 @@ Function SetOutfitFromParts(Actor NPC)
 	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" completed outfit assignment in "+(Utility.GetCurrentRealTime()-NPC.GetValue(NPCTimer))+" seconds")
 
 	CountActors += 1
+	Actorslist+="\n"+NPC+NPC.GetLeveledActorBase().GetName()
 	NPC.SetOutfit(ForceChangeOutfit,false)
 	NPC.SetOutfit(EmptyOutfit)
 	NPC.SetValue(OSMaintTime,Utility.GetCurrentRealTime())
@@ -555,14 +661,16 @@ endfunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Bool Function CheckEligibility(Actor NPC)
+Bool Function CheckEligibility(Actor NPC, Bool PreCheck=False)
 
 	If NPC.IsDisabled()|| NPC.IsDeleted()||NPC.IsChild()||NPC.IsDead()
 		return false
 	endif
-
-	If NPC.GetItemCount(OSAlwaysChangeItem)>0
-		return True
+	
+	If !Precheck
+		If NPC.GetItemCount(OSAlwaysChangeItem)>0
+			return True
+		endif
 	endif
 	
 ;Check for Armor Racks
@@ -580,10 +688,11 @@ Bool Function CheckEligibility(Actor NPC)
 ;		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" OSMaintTime<GetCurrentRealTime and shouldn't be. Overriding OSDontChangeItem")
 ;		return true
 ;	else
-	If (NPC.GetItemCount(OSDontChangeItem)>0)
-		return False
+	If !Precheck
+		If (NPC.GetItemCount(OSDontChangeItem)>0)
+			return False
+		endif
 	endif
-
 ;check against AAF if enabled
 	if (OSUseAAF.GetValueInt()==1) 
 
@@ -719,7 +828,7 @@ Function DebugNPC()
 	If NPC
 		Form[] InvItems = NPC.GetInventoryItems()
 		int i=0
-		string longinv
+		string longinv="\n       INV: Equipped Items"
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
 				Longinv += "\n       INV: IsEquipped="+NPC.IsEquipped(akitem)+akItem+akItem.GetName()
@@ -728,24 +837,26 @@ Function DebugNPC()
 				endif
 			i += 1
 		EndWhile
+		longinv+="\n       INV: No More Equipped Items"
 		int MaintTimer=(NPC.GetValue(OSMaintTime) as Int)+((MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as int)*(MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General")) as Int)
 		String ddlog="\n   ***************DebugNPC()***************"
 		ddlog+="\n   ***************Name:"+NPC+NPC.GetLeveledActorBase().GetName()
-		ddlog+="\n   ****************Sex:"+NPC+NPC.GetLeveledActorBase().GetSex()
-		ddlog+="\n   ***************Race:"+NPC+NPC.GetLeveledActorBase().GetRace()
-		ddlog+="\n   *********DontChange:"+NPC+NPC.GetItemCount(OSDontChangeItem)
-		ddlog+="\n   *********OSBodyDone:"+NPC+NPC.GetValue(OSBodyDone)
-		ddlog+="\n   ********OSMaintWait:"+NPC+NPC.GetValue(OSMaintWait)
-		ddlog+="\n   ********OSMaintTime:"+NPC+NPC.GetValue(OSMaintTime)
-		ddlog+="\n   **********IsDeleted:"+NPC+NPC.IsDeleted()
-		ddlog+="\n   *********IsDisabled:"+NPC+NPC.IsDisabled()
-		ddlog+="\n   ****PowerArmorCheck:"+NPC+PowerArmorCheck(NPC)
-		ddlog+="\n   ************IsChild:"+NPC+NPC.IsChild()
-		ddlog+="\n   *************IsDead:"+NPC+NPC.IsDead()
+		ddlog+="\n   ****************Sex:"+NPC.GetLeveledActorBase().GetSex()
+		ddlog+="\n   ***************Race:"+NPC.GetLeveledActorBase().GetRace()
+		ddlog+="\n   *********DontChange:"+NPC.GetItemCount(OSDontChangeItem) as Bool
+		ddlog+="\n   *********OSBodyDone:"+NPC.GetValue(OSBodyDone) as Bool
+		ddlog+="\n   **********IsDeleted:"+NPC.IsDeleted() as Bool
+		ddlog+="\n   *********IsDisabled:"+NPC.IsDisabled() as Bool
+		ddlog+="\n   ****PowerArmorCheck:"+PowerArmorCheck(NPC) as Bool
+		ddlog+="\n   ************IsChild:"+NPC.IsChild() as Bool
+		ddlog+="\n   *************IsDead:"+NPC.IsDead() as Bool
 		ddlog+="\n   ***********Distance:"+NPC+PlayerRef.GetDistance(NPC)
+		ddlog+="\n   ********OSMaintWait="+NPC.Getvalue(OSMaintWait) as Bool
 		ddlog+="\n   *******OSMaintTime+="+MaintTimer
+		ddlog+="\n   ****MaintainerSpell="+NPC.HasSpell(Maintainer) as Bool
 		ddlog+="\n   ********CurrentTime="+Utility.GetCurrentRealTime()
-		ddlog+="\n   ********OSMaintWait="+NPC.Getvalue(OSMaintWait)
+		
+		
 		ddlog+="\n   *************Outfit="+NPC.GetLeveledActorBase().Getoutfit()+NPC.GetLeveledActorBase().Getoutfit().GetName()
 		ddlog+="\n   ***********FCOutfit="+ForceChangeOutfit
 		ddlog+="\n"+longinv+"\n"
