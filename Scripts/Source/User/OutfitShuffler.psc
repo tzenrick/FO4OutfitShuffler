@@ -111,7 +111,7 @@ string OSLogName="OutfitShuffler"
 int TimeID = 888
 int MultCounter = 0
 int RaceCounter
-
+int CountActors
 
 ;Arrays
 FormList[] PForm
@@ -219,7 +219,7 @@ Event OnTimer(int aiTimerID)
 				endif
 				float TimerStart=Utility.GetCurrentRealTime()
 				TimerTrap()
-				dlog(1,"TimerTrap("+MultCounter+") run in "+(Utility.GetCurrentRealTime()-TimerStart)+" seconds")
+				dlog(1,"TimerTrap("+MultCounter+") run in "+(Utility.GetCurrentRealTime()-TimerStart)+" seconds. "+CountActors+" NPCs changed.")
 			else
 				UnRegisterForPlayerTeleport()
 				PlayerRef.RemoveSpell(ContainersSpell)
@@ -247,6 +247,7 @@ endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 function ScanNPCs(bool Force=False)
 	if OSSuspend.GetValueInt() == 0 && CountParts()>1
+		CountActors = 0
 		RaceCounter = 0
 		While RaceCounter < OSActorRaces.GetSize()
 			int iActorArray = 0
@@ -378,7 +379,7 @@ Function SetOutfitFromParts(Actor NPC)
 	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" Starting Outfit Assignment")
 
 ;Do NewScale
-	If ((MCM.GetModSettingBool("OutfitShuffler", "bNPCUseScaling:General") as Bool==True) && !(NPC.GetValue(OSBodyDone)==1))||NPC.GetItemCount(OSAlwaysScaleItem)>0
+	If NPC.GetItemCount(OSAlwaysScaleItem)>0 || ((MCM.GetModSettingBool("OutfitShuffler", "bNPCUseScaling:General") as Bool==True) && !(NPC.GetValue(OSBodyDone)==1))
 		float NPCNewScale = 1.0
 		if (MCM.GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float) >= (MCM.GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float)
 			NPCNewScale=(MCM.GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float)
@@ -390,10 +391,10 @@ Function SetOutfitFromParts(Actor NPC)
 	endif
 
 ;Do BodyGen
-	If ((MCM.GetModSettingBool("OutfitShuffler", "bRandomBodyGen:General") as Bool==True) && !(NPC.GetValue(OSBodyDone)==1))||NPC.GetItemCount(OSAlwaysBodyGenItem)>0
+	If (NPC.GetItemCount(OSAlwaysBodyGenItem)>0) || (((MCM.GetModSettingBool("OutfitShuffler", "bRandomBodyGen:General") as Bool==True) && !(NPC.GetValue(OSBodyDone)==1)))
 		BodyGen.RegenerateMorphs(NPC, true)
 		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is doing BodyGen")
-		if (MCM.GetModSettingBool("OutfitShuffler", "bBodygenOneShot:General") as Bool==True)
+		if (MCM.GetModSettingBool("OutfitShuffler", "bBodygenOneShot:General") as Bool==True) && (NPC.GetItemCount(OSAlwaysBodyGenItem)==0)
 			dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is getting OSBodyDone from BodyGenOneShot=True")
 			NPC.SetValue(OSBodyDone,1)
 		endif
@@ -544,6 +545,7 @@ Function SetOutfitFromParts(Actor NPC)
 	endif
 	dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" completed outfit assignment in "+(Utility.GetCurrentRealTime()-NPC.GetValue(NPCTimer))+" seconds")
 
+	CountActors += 1
 	NPC.SetOutfit(ForceChangeOutfit,false)
 	NPC.SetOutfit(EmptyOutfit)
 	NPC.SetValue(OSMaintTime,Utility.GetCurrentRealTime())
@@ -559,6 +561,10 @@ Bool Function CheckEligibility(Actor NPC)
 		return false
 	endif
 
+	If NPC.GetItemCount(OSAlwaysChangeItem)>0
+		return True
+	endif
+	
 ;Check for Armor Racks
 	if LL_FourPlay.StringFind(NPC.GetLeveledActorBase().GetName(), "Armor Rack") != -1
 		return False
@@ -574,7 +580,27 @@ Bool Function CheckEligibility(Actor NPC)
 ;		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" OSMaintTime<GetCurrentRealTime and shouldn't be. Overriding OSDontChangeItem")
 ;		return true
 ;	else
+	If (NPC.GetItemCount(OSDontChangeItem)>0)
+		return False
+	endif
 
+;check against AAF if enabled
+	if (OSUseAAF.GetValueInt()==1) 
+
+		if AAF_ActiveActors.HasForm(NPC)
+			return false
+		endif
+
+		if NPC.HasKeyword(AAFBusyKeyword)
+			return false
+		endif
+
+		if NPC.GetActorBase() == AAF_Doppelganger
+			return false
+		endif
+
+	endif
+	
 	if NPC.GetValue(OSMaintTime)==0 && NPC.GetValue(OSMaintWait)==0
 		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" OSMaintTime==0 and shouldn't. Overriding OSDontChangeItem")
 		NPC.SetOutfit(ForceChangeOutfit)
@@ -582,10 +608,6 @@ Bool Function CheckEligibility(Actor NPC)
 	endif
 
 	If NPC.GetValue(OSMaintWait)==1
-		return False
-	endif
-
-	If (NPC.GetItemCount(OSDontChangeItem)>0)
 		return False
 	endif
 
@@ -625,23 +647,6 @@ Bool Function CheckEligibility(Actor NPC)
 
 	endif
 
-;check against AAF if enabled
-	if (OSUseAAF.GetValueInt()==1) 
-
-		if AAF_ActiveActors.HasForm(NPC)
-			return false
-		endif
-
-		if NPC.HasKeyword(AAFBusyKeyword)
-			return false
-		endif
-
-		if NPC.GetActorBase() == AAF_Doppelganger
-			return false
-		endif
-
-	endif
-	
 	return true
 endFunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -697,7 +702,7 @@ Function ChangeNow()
 	GetOutfitChances()
 	Actor NPC = LL_FourPlay.LastCrossHairActor()
 	If NPC != None
-		dLog(1,NPC+""+NPC.GetLeveledActorBase().GetName()+" is in ChangeNow()")
+		dlog(2,NPC+""+NPC.GetLeveledActorBase().GetName()+" will be changed immediately")
 		;SetOutfitFromParts(NPC); Gonna try this the fancy way.
 		Var[] params = new Var[1]
 		params[0] = NPC
@@ -753,8 +758,8 @@ Function DebugNPC()
 			i += 1
 			Endwhile
 		endif
-		ddlog="\n   ************Finish DebugNPC()***********"
-		dlog(1,ddlog)
+		ddlog+="\n   ************Finish DebugNPC()***********"
+		dlog(2,ddlog)
 	endif
 endfunction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,4 +1,5 @@
-OutfitShuffler Mod Configuration Menu Options
+Outfir Shuffler Mod Configuration Menu Options
+
 
 OutfitShuffler is a Fallout 4 mod that randomly shuffles the outfits of NPCs in the game. It allows you to customize the chances of certain outfit pieces appearing, and also allows you to add random weapons, bodygen and scale changes.
 

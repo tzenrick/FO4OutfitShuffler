@@ -118,15 +118,20 @@ Keyword AAFBusyKeyword
 Keyword DDRendered
 Keyword DDInventory
 
+Spell EBCC_DirtTier01
+Spell EBCC_DirtTier02
+Spell EBCC_DirtTier03
+
 int tid=5309
 bool localhold
+String ddlog
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnInit()
 	StartTimer(1.0,tID)
 	localhold=false
-	
 EndEvent
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;
@@ -155,8 +160,28 @@ Event OnTimer(int TimerID)
 			DDRendered = Game.GetFormFromFile(0x004c5b, "Devious Devices.esm") as Keyword
 			DDInventory = Game.GetFormFromFile(0x004c5c, "Devious Devices.esm") as Keyword
 		endif
-
-		string ddlog="\n"+NPC+NPC.GetLeveledActorBase().GetName()+"\nMaintenance Was held for "+escape+" cycles.\nNPC.Is3DLoaded="+NPC.Is3DLoaded()+"\nOSMaintWait="+NPC.GetValue(OSMaintWait)+"\nOSMaintTime Offset="+(Utility.GetCurrentRealTime()-NPC.GetValue(OSMaintTime))+"\nOSSuspend="+OSSuspend.GetValueInt()+"\nIn Furniture>"+NPC.GetFurnitureReference()+"<>"+NPC.GetFurnitureReference()+"<"
+		
+		if EBCC_DirtTier01==None
+			If Game.IsPluginInstalled("Commonwealth Captives.esp")
+				ddlog+="\nCommonwealth Captives.esp found"
+				EBCC_DirtTier01=Game.GetFormFromFile(0x03d0,"Commonwealth Captives.esp") as Spell
+				ddlog+="\nGot Spell FromFile="+EBCC_DirtTier01
+				EBCC_DirtTier02=Game.GetFormFromFile(0x03d1,"Commonwealth Captives.esp") as Spell
+				ddlog+="\nGot Spell FromFile="+EBCC_DirtTier02
+				EBCC_DirtTier03=Game.GetFormFromFile(0x03d2,"Commonwealth Captives.esp") as Spell
+				ddlog+="\nGot Spell FromFile="+EBCC_DirtTier03
+				If NPC.HasSpell(EBCC_DirtTier01)||\
+				NPC.HasSpell(EBCC_DirtTier02)||\
+				NPC.HasSpell(EBCC_DirtTier03)
+					NPC.RemoveSpell(EBCC_DirtTier01)
+					NPC.RemoveSpell(EBCC_DirtTier02)
+					NPC.RemoveSpell(EBCC_DirtTier03)
+				endif
+			endif
+		endif
+		
+		
+		ddlog="\n"+NPC+NPC.GetLeveledActorBase().GetName()+"\nMaintenance Was held for "+escape+" cycles.\nNPC.Is3DLoaded="+NPC.Is3DLoaded()+"\nOSMaintWait="+NPC.GetValue(OSMaintWait)+"\nOSMaintTime Offset="+(Utility.GetCurrentRealTime()-NPC.GetValue(OSMaintTime))+"\nOSSuspend="+OSSuspend.GetValueInt()+"\nIn Furniture>"+NPC.GetFurnitureReference()+"<>"+NPC.GetFurnitureReference()+"<"
 		if ( NPC == none || !NPC.Is3DLoaded() ) || NPC.GetValue(OSMaintWait)==1 || OSSuspend.GetValueInt() == 1 || NPC.GetFurnitureReference()!=None || NPC.HasKeyword(AAFBusyKeyword)
 			Utility.Wait(Utility.RandomFloat(0.5,2.0))
 		else
@@ -184,7 +209,6 @@ endevent
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnItemUnequipped(Form akBaseObject, ObjectReference akReference)
 	if akBaseObject!=None||akReference!=None
-		string ddlog;=NPC+NPC.GetLeveledActorBase().GetName()+"\nOnItemUnequipped() \nOSMaintWait()="+NPC.GetValue(OSMaintWait)+" \nCheckAAFSafe()="+CheckAAFSafe(True)+" \nPowerArmorCheck()="+PowerArmorCheck(True)+" \nItem=>"+akBaseObject+"<>"+akBaseObject.GetName()+"< \nakReference=>"+akReference+"<>"+akReference.GetName()+"<\n OSSuspend="+OSSuspend.GetValueInt()
 		if NPC.GetValue(OSMaintWait)==0 && CheckAAFSafe(True) && !PowerArmorCheck(True) && OSSuspend.GetValueInt()==0 && !NPC.HasKeyword(AAFBusyKeyword)
 			NPC.SetValue(OSMaintWait,1)
 			RemoveInventoryEventFilter(None)
@@ -235,7 +259,6 @@ Function EveryDayImShufflin()
 
 	Bool WearingDD
 	NPC.SetValue(OSMaintWait,1)
-	string ddlog;="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" Every day I'm Shufflin'"
 
 	if NPC.Is3DLoaded() && !NPC.IsDead() && !NPC.IsDeleted() && !NPC.IsDisabled() && !PowerArmorCheck() && CheckAAFSafe()
 		ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" Checking for Maintenance"
@@ -257,15 +280,16 @@ Function EveryDayImShufflin()
 		ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" Starting Base/DLC Items Removal"
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
-			If (akItem as Armor) &&\
-			(!OSAllItems.HasForm(akItem as ObjectReference) ||\
-			!(akItem as Armor).HasKeyword(DDRendered) ||\
-			!(akItem as Armor).HasKeyword(DDInventory) ||\
-			!SafeForm.HasForm(akItem as ObjectReference)) &&\
-			(0<akItem.getformid() && akItem.getformid()<0x07000000) &&\
-			!(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
-				NPC.removeitem(akItem,-1)
-				ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" removed"
+			If (akItem as Armor)
+				If (!OSAllItems.HasForm(akItem as ObjectReference) ||\
+				!(akItem as Armor).HasKeyword(DDRendered) ||\
+				!(akItem as Armor).HasKeyword(DDInventory) ||\
+				!SafeForm.HasForm(akItem as ObjectReference)) &&\
+				(0<akItem.getformid() && akItem.getformid()<0x07000000) &&\
+				!(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
+					NPC.removeitem(akItem,-1)
+					ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" removed"
+				endif
 			endif
 		i += 1
 		EndWhile
@@ -275,11 +299,13 @@ Function EveryDayImShufflin()
 		ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" Starting Regular Items Equipping"
 		i=0
 		While (i < InvItems.Length)
-			Form akItem = InvItems[i]
-			If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
-				ArmorItems+=1
-				NPC.equipitem(akItem)
-				ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped"
+		Form akItem = InvItems[i]
+			If (akItem as Armor)
+				If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
+					ArmorItems+=1
+					NPC.equipitem(akItem)
+					ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped"
+				endif
 			endif
 		i += 1
 		endwhile
@@ -304,22 +330,24 @@ Function EveryDayImShufflin()
 		i=0
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
-			if (OSUseDD.GetValueInt()>0) && ((akItem as Armor).HasKeyword(DDRendered)||(akItem as Armor).HasKeyword(DDInventory))
-				if NPC.IsEquipped(akItem)
-					WearingDD=True
-					ArmorItems+=1
-					ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" is wearing DD="+akItem+akItem.GetName()
-				else
-					WearingDD=True
-					ArmorItems+=1
-					npc.equipitem(akItem)
-					ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" FORCE equipped DD="+akItem+akItem.GetName()
+			If (akItem as Armor)
+				if (OSUseDD.GetValueInt()>0) && ((akItem as Armor).HasKeyword(DDRendered)||(akItem as Armor).HasKeyword(DDInventory))
+					if NPC.IsEquipped(akItem)
+						WearingDD=True
+						ArmorItems+=1
+						ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" is wearing DD="+akItem+akItem.GetName()
+					else
+						WearingDD=True
+						ArmorItems+=1
+						npc.equipitem(akItem)
+						ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" FORCE equipped DD="+akItem+akItem.GetName()
+					endif
 				endif
 			endif
 		i += 1
 		endwhile
 		
-		if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0
+		if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0 && NPC.GetItemCount(OSAlwaysChangeItem)==0
 			NPC.AddItem(OSDontChangeItem,1,true)
 			ddLog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" DontChange added because of DD."
 		endif
@@ -329,7 +357,7 @@ Function EveryDayImShufflin()
 		i=0
 		InvItems = None
 		InvItems = NPC.GetInventoryItems()
-		While (i < InvItems.Length) && NPC.GetItemCount(OSDontChangeItem)==0
+		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
 			If (akItem as Armor)
 				if !NPC.IsEquipped(akItem)
@@ -365,7 +393,7 @@ Function EveryDayImShufflin()
 			return
 		endif
 
-		if (MCM.GetModSettingBool("OutfitShuffler", "bOneShot:General") as Bool==1) && NPC.GetItemCount(OSDontChangeItem)<1
+		if (MCM.GetModSettingBool("OutfitShuffler", "bOneShot:General") as Bool==1) && NPC.GetItemCount(OSDontChangeItem)<1 && NPC.GetItemCount(OSAlwaysChangeItem)==0
 			NPC.AddItem(OSDontChangeItem,1)
 			ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" Added OSDontChangeItem"
 		endif
@@ -378,6 +406,7 @@ Function EveryDayImShufflin()
 
 	ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" OSMaintTime Set To="+NPC.GetValue(OSMaintTime)
 	ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+" completed outfit maintenance in "+(Utility.GetCurrentRealTime()-NPC.GetValue(NPCTimer))+" seconds"
+	
 	dlog(1,ddlog)
 
 	AddInventoryEventFilter(None)
@@ -435,17 +464,23 @@ endfunction
 ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function dLog(int dLogLevel,string LogMe); 6.25 Implementing Leveled Logging. Sloppily.
-	Int LogLevel = MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int
 
-	If MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int > 0
-		debug.TraceUser(OSLogName, "[Maintainer]"+LogMe,1)
-	endif
+	If MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int>0
 
-	If dLogLevel > 1
-		debug.Notification("[OSm] "+LogMe)
-	endif
+		Debug.OpenUserLog(OSLogName)
+	
+		If MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int > 0
+			debug.TraceUser(OSLogName, "[Maintainer]"+LogMe,1)
+		endif
 
-	If MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 2 || dLogLevel == 2
-		LL_FourPlay.PrintConsole("[OSm] "+LogMe)
+		If dLogLevel > 1
+			debug.Notification("[OSm] "+LogMe)
+		endif
+
+		If MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 2 || dLogLevel == 2
+			LL_FourPlay.PrintConsole("[OSm] "+LogMe)
+		endif
+	
 	endif
+	ddlog=""
 endFunction
