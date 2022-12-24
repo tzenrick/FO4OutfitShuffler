@@ -7,9 +7,6 @@ Actor Property PlayerRef Auto Const
 ObjectReference MyOnlyContainer
 FormList Property OSTempContainer Auto
 String OSLogName="OutfitShuffler"
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
 	If OSSuspend.GetValueInt()==0
 		OSSuspend.SetValueInt(1)
@@ -44,9 +41,6 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 		dlog(1,"Setting OSSuspend=0")
 	endif
 endEvent
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnDistanceGreaterThan(ObjectReference akObj1, ObjectReference akObj2, float afDistance)
 	int i=0
 	While i<OSTempContainer.GetSize()
@@ -57,14 +51,9 @@ Event OnDistanceGreaterThan(ObjectReference akObj1, ObjectReference akObj2, floa
 	OSTempContainer.Revert()
 	UnRegisterForDistanceEvents(PlayerRef, MyOnlyContainer)
 endevent
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Event OnEffectStart(Actor akTarget, Actor akCaster)
 	AddInventoryEventFilter(None)
 EndEvent
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function dLog(int dLogLevel,string LogMe); 6.25 Implementing Leveled Logging. Sloppily.
 	Int LogLevel = MCM.GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int
 
