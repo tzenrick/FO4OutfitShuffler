@@ -177,12 +177,16 @@ Event OnTimer(int TimerID)
 				NPC.RemoveSpell(EBCC_DirtTier03)
 			endif
 		endif		
-		
-		ddlog+="\nMaintenance Was held for "+escape+" cycles.\nNPC.Is3DLoaded="+NPC.Is3DLoaded()+"\nOSMaintWait="+NPC.GetValue(OSMaintWait)+"\nOSMaintTime Offset="+(Utility.GetCurrentRealTime()-NPC.GetValue(OSMaintTime))+"\nOSSuspend="+OSSuspend.GetValueInt()+"\nIn Furniture>"+NPC.GetFurnitureReference()+"<>"+NPC.GetFurnitureReference()+"<"
-		if ( NPC == none || !NPC.Is3DLoaded() ) || NPC.GetValue(OSMaintWait)>0 || OSSuspend.GetValueInt() == 1 || NPC.GetFurnitureReference()!=None || NPC.HasKeyword(AAFBusyKeyword)
-			Utility.Wait(Utility.RandomFloat(0.5,2.0))
+		int escape2
+		int MaintTimer=(NPC.GetValue(OSMaintTime) as Int)+((MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as int)*(MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General")) as Int)
+		If NPC.GetValue(OSMaintWait)==1 && MaintTimer>Utility.GetCurrentRealTime()
+			NPC.SetValue(OSMaintWait,0)
 		else
-			NPC.SetValue(OSMaintWait,1)
+			While ( NPC == none || !NPC.Is3DLoaded() ) || NPC.GetValue(OSMaintWait)>0 || OSSuspend.GetValueInt() == 1 || NPC.GetFurnitureReference()!=None || NPC.HasKeyword(AAFBusyKeyword)
+				Utility.Wait(1.0)
+				escape2+=1
+			endwhile
+			;ddlog="\nMaintenance Was held for "+escape+" cycles+"+(escape2)+" seconds.\nNPC.Is3DLoaded="+NPC.Is3DLoaded()+"\nOSMaintWait="+NPC.GetValue(OSMaintWait)+"\nOSMaintTime Offset="+(Utility.GetCurrentRealTime()-NPC.GetValue(OSMaintTime))+"\nOSSuspend="+OSSuspend.GetValueInt()+"\nIn Furniture>"+NPC.GetFurnitureReference()+"<>"+NPC.GetFurnitureReference()+"<"
 			EveryDayImShufflin()
 		endif
 		AddInventoryEventFilter(None)
@@ -240,11 +244,28 @@ Event OnItemUnequipped(Form akBaseObject, ObjectReference akReference)
 				If NPC.GetLeveledActorBase().GetSex()==1
 					SafeForm = XYSafeItems
 				endif
+				If (akItem as Armor)
+					If akItem.getformid()<0x07000000 && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
+						if OSAllItems.HasForm(akItem as ObjectReference) || SafeForm.HasForm(akItem as ObjectReference) || (OSUseDD.GetValue()>0 && ((akItem as Armor).HasKeyword(DDRendered) || (akItem as Armor).HasKeyword(DDInventory)))
+							ddlog+="OnItemUnequipped() "+NPC+NPC.GetLeveledActorBase().GetName()+" Reequipped="+akItem
+							NPC.equipitem(akItem)
+							dlog(1,ddlog)
+							return
+						else
+							NPC.removeitem(akItem,-1)
+							ddlog+="OnItemUnequipped() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" Base/DLC removed"
+							dlog(1,ddlog)
+							return
+						endif
+					endif
+					If akItem.getformid()>0x06ffffff || (akItem.getformid()<0x07000000 && (MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)) || OSAllItems.HasForm(akItem as ObjectReference) || SafeForm.HasForm(akItem as ObjectReference)
+						ddlog+="OnItemUnequipped() "+NPC+NPC.GetLeveledActorBase().GetName()+" Reequipped="+akItem
+						NPC.equipitem(akItem)
+						dlog(1,ddlog)
+						return
+					endif
+				endif
 				If !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference)
-					ddlog+="OnItemUnequipped() "+NPC+NPC.GetLeveledActorBase().GetName()+" Reequipped="+akItem
-					NPC.equipitem(akItem)
-					dlog(1,ddlog)
-					return
 				endif
 				if SafeForm.HasForm(akItem as ObjectReference)
 					ddlog+="OnItemUnequipped() "+NPC+NPC.GetLeveledActorBase().GetName()+" Reequipped SafeItem="+akItem
@@ -274,29 +295,34 @@ Function EveryDayImShufflin()
 	NPC.SetValue(OSMaintWait,1)
 
 	if NPC.Is3DLoaded() && !NPC.IsDead() && !NPC.IsDeleted() && !NPC.IsDisabled() && !PowerArmorCheck() && CheckAAFSafe()
-		ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" Checking for Maintenance"
+		ddLog="EveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" Checking for Maintenance"
 		NPC.SetValue(NPCTimer,Utility.GetCurrentRealTime())
 		FormList SafeForm
 
 		If NPC.GetLeveledActorBase().GetSex()==0
 			SafeForm = XYSafeItems
+			;ddlog+="\nSafeForm Male="+XYSafeItems+SafeForm
 		endif
 
 		If NPC.GetLeveledActorBase().GetSex()==1
 			SafeForm = XXSafeItems
+			;ddlog+="\nSafeForm Female="+XXSafeItems+SafeForm
 		endif
-
+		
 		Int i=0
 		Form[] InvItems = NPC.GetInventoryItems()
 		
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
+			;ddlog+="\nEveryDayImShufflin()\nItem="+(akItem as Armor)+(akItem as Armor).GetName()+akItem.getformid()+"<117440512="+(akItem.getformid()<0x07000000 as Bool)+"\nOSAllItems.HasForm="+(OSAllItems.HasForm(akItem as ObjectReference) as Bool)+"\nItem.HasKeyword(DDRendered)="+((akItem as Armor).HasKeyword(DDRendered) as Bool)+"\nItem.HasKeyword(DDInventory)="+((akItem as Armor).HasKeyword(DDInventory) as Bool)
 			If (akItem as Armor)
-				If (!OSAllItems.HasForm(akItem as ObjectReference) || !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference)) &&\
-				(0<akItem.getformid() && akItem.getformid()<0x07000000) &&\
-				!(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
-					NPC.removeitem(akItem,-1)
-					ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" removed"
+				If akItem.getformid()<0x07000000 && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
+					if !(OSAllItems.HasForm(akItem as ObjectReference) || SafeForm.HasForm(akItem as ObjectReference) || (OSUseDD.GetValue()>0 && ((akItem as Armor).HasKeyword(DDRendered) || (akItem as Armor).HasKeyword(DDInventory))))
+						ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" OSAllItem, SafeItem, or DD in maintenance"
+					else
+						NPC.removeitem(akItem,-1)
+						ddlog+="\n"+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" Base/DLC removed by maintenance"
+					endif
 				endif
 			endif
 		i += 1
@@ -307,9 +333,9 @@ Function EveryDayImShufflin()
 		While (i < InvItems.Length)
 		Form akItem = InvItems[i]
 			If (akItem as Armor)
-				If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && (!(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory) || !SafeForm.HasForm(akItem as ObjectReference))
+				If (akItem as Armor) && ((OSUseDD.GetValue()>0 && !(akItem as Armor).HasKeyword(DDRendered) || !(akItem as Armor).HasKeyword(DDInventory)) || !SafeForm.HasForm(akItem as ObjectReference))
 					NPC.equipitem(akItem)
-					ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped"
+					ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" equipped by maintenance"
 				endif
 			endif
 		i += 1
@@ -320,7 +346,7 @@ Function EveryDayImShufflin()
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
 			if SafeForm.HasForm(akItem as ObjectReference)
-				ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" is in SafeItems"
+				ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+akItem.GetName()+" is in SafeItems by maintenance"
 				NPC.EquipItem(akItem)
 				endif
 		i += 1
@@ -331,14 +357,14 @@ Function EveryDayImShufflin()
 		While (i < InvItems.Length)
 			Form akItem = InvItems[i]
 			If (akItem as Armor)
-				if (OSUSeDD.GetValue()>0) && ((akItem as Armor).HasKeyword(DDRendered)||(akItem as Armor).HasKeyword(DDInventory)) && !(MCM.GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool
+				if (OSUSeDD.GetValue()>0) && ((akItem as Armor).HasKeyword(DDRendered)||(akItem as Armor).HasKeyword(DDInventory))
 					if NPC.IsEquipped(akItem)
 						WearingDD=True
-						ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" is wearing DD="+akItem+akItem.GetName()
+						ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" is wearing DD="+akItem+akItem.GetName()+" in maintenance"
 					else
 						WearingDD=True
 						npc.equipitem(akItem)
-						ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" FORCE equipped DD="+akItem+akItem.GetName()
+						ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+""+akItem+" FORCE equipped DD="+akItem+akItem.GetName()+" by maintenance"
 					endif
 				endif
 			endif
@@ -347,7 +373,7 @@ Function EveryDayImShufflin()
 		
 		if WearingDD && NPC.GetItemCount(OSDontChangeItem)==0 && NPC.GetItemCount(OSAlwaysChangeItem)==0
 			NPC.AddItem(OSDontChangeItem,1,true)
-			ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" DontChange added because of DD."
+			ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" DontChange added because of DD in maintenance."
 		endif
 		Utility.Wait(Utility.RandomFloat(0.5,2.0))
 		i=0
@@ -357,7 +383,7 @@ Function EveryDayImShufflin()
 			Form akItem = InvItems[i]
 			If (akItem as Armor)
 				if !NPC.IsEquipped(akItem)
-					ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" removed conflict item "+akItem+akItem.GetName()
+					ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" removed conflict item "+akItem+akItem.GetName()+" by maintenance"
 					NPC.RemoveItem(akItem, -1)
 				endif
 			endif
@@ -376,19 +402,20 @@ Function EveryDayImShufflin()
 				endif
 			i += 1
 		EndWhile	
-		ddlog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" has "+ArmorItems+" ArmorItems"
-
+		ddlog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" has "+ArmorItems+" ArmorItems in maintenance"
 		if NPC.GetItemCount(OSDontChangeItem)==0 && ArmorItems<1 && (MCM.GetModSettingBool("OutfitShuffler", "bNoNudes:General") as Bool)
-			ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" not enough armor in inventory("+ArmorItems+"), resetting outfit."
+			ddLog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" not enough armor in inventory("+ArmorItems+"), resetting outfit. OSMaintWait=2, OSMaintTime=0"
 			;NPC.SetOutfit(ForceChangeOutfit)
+			NPC.RemoveItem(OSDontChangeItem, -1)
 			NPC.SetValue(OSMaintWait,2)
+			NPC.SetValue(OSMaintTime, 0)
 			dlog(1,ddlog)
 			return
 		endif
 
 		if (MCM.GetModSettingBool("OutfitShuffler", "bOneShot:General") as Bool==1) && NPC.GetItemCount(OSDontChangeItem)<1 && NPC.GetItemCount(OSAlwaysChangeItem)==0
 			NPC.AddItem(OSDontChangeItem,1)
-			ddlog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" Added OSDontChangeItem"
+			ddlog+="\nEveryDayImShufflin() "+NPC+NPC.GetLeveledActorBase().GetName()+" Added OSDontChangeItem in maintenance"
 		endif
 
 	endif

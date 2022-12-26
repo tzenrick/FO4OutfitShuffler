@@ -277,6 +277,15 @@
 			"type": "section"
 		},
 		{
+			"id": "DebugHotkey",
+			"text": "This is a hotkey for a debug function.",
+			"type": "hotkey",
+			"help": "This is a hotkey.",
+			"valueOptions": {
+			"allowModifierKeys": true
+			}
+		},
+		{
 			"id": "ChangeNow",
 			"text": "Changes the outfit on the targeted NPC as soon as possible.",
 			"type": "hotkey",
