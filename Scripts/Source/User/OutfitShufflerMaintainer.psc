@@ -9,6 +9,8 @@ ActorValue Property OSMaintTime Auto
 ActorValue Property OSBodyDone Auto
 ActorValue Property OSMaintWait Auto
 ActorValue Property NPCTimer Auto
+ActorValue Property OSNPCVersion Auto
+Float NPCVersionToSet = 7.6
 
 Formlist Property FactionsToIgnore Auto
 Formlist Property GoodOutfits Auto Const
@@ -80,6 +82,7 @@ Formlist Property XYTorsoArmor Auto
 GlobalVariable Property OSSuspend Auto
 GlobalVariable Property OSUseAAF Auto
 GlobalVariable Property OSUseDD Auto
+GlobalVariable Property OSVersion auto
 
 MiscObject Property OSDontChangeItem Auto Const
 MiscObject Property OSAlwaysChangeItem Auto Const
@@ -127,6 +130,8 @@ bool localhold
 String ddlog
 
 Event OnInit()
+	dlog(1,"Added OutfitShuffler Maintainer Spell "+OSVersion.GetValue())
+	NPC.SetValue(OSNPCVersion, NPCVersionToSet)
 	StartTimer(1.0,tID)
 	localhold=false
 EndEvent
@@ -177,6 +182,11 @@ Event OnTimer(int TimerID)
 				NPC.RemoveSpell(EBCC_DirtTier03)
 			endif
 		endif		
+		If NPC.GetValue(OSNPCVersion)!=OSVersion.GetValue()
+			if NPC.HasSpell(Maintainer)
+				NPC.RemoveSpell(Maintainer)
+			endif
+		endif
 		int escape2
 		int MaintTimer=(NPC.GetValue(OSMaintTime) as Int)+((MCM.GetModSettingFloat("OutfitShuffler", "fShortTime:General") as int)*(MCM.GetModSettingInt("OutfitShuffler", "iLongMult:General")) as Int)
 		If NPC.GetValue(OSMaintWait)==1 && MaintTimer>Utility.GetCurrentRealTime()

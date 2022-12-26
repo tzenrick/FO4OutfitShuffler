@@ -4,7 +4,7 @@
 	"minMcmVersion": 1,
 	"content": [
 		{
-			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v7.3</font>",
+			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v7.6</font>",
 			"type": "text",
 			"html": true
 		},
@@ -275,15 +275,6 @@
 		{
 			"text": "Hotkeys",
 			"type": "section"
-		},
-		{
-			"id": "DebugHotkey",
-			"text": "This is a hotkey for a debug function.",
-			"type": "hotkey",
-			"help": "This is a hotkey.",
-			"valueOptions": {
-			"allowModifierKeys": true
-			}
 		},
 		{
 			"id": "ChangeNow",

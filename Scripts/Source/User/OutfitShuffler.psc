@@ -12,6 +12,7 @@ ActorValue Property OSMaintTime Auto
 ActorValue Property OSBodyDone Auto
 ActorValue Property OSMaintWait Auto
 ActorValue Property NPCTimer Auto
+ActorValue Property OSNPCVersion Auto
 
 Formlist Property FactionsToIgnore Auto
 Formlist Property GoodOutfits Auto Const
@@ -83,6 +84,7 @@ Formlist Property XYTorsoArmor Auto
 GlobalVariable Property OSSuspend Auto
 GlobalVariable Property OSUseAAF Auto
 GlobalVariable Property OSUseDD Auto
+GlobalVariable Property OSVersion auto
 
 MiscObject Property OSDontChangeItem Auto Const
 MiscObject Property OSAlwaysChangeItem Auto Const
@@ -130,7 +132,8 @@ Keyword DDInventory
 String SortLog
 
 Event OnInit()
-	dlog(2,"OutfitShuffler Installed")
+	OSVersion.Setvalue(7.6)
+	dlog(2,"OutfitShuffler "+OSVersion.GetValue()+" Installed")
 	CancelTimer(TimeID)
 	OSSuspend.SetValueInt(0)
 	Debug.OpenUserLog(OSLogName)
@@ -583,11 +586,23 @@ Function SetOutfitFromParts(Actor NPC)
 	NPC.SetValue(OSMaintTime,Utility.GetCurrentRealTime())
 	NPC.SetValue(OSMaintWait,0)
 	if !NPC.HasSpell(Maintainer)
+		NPC.SetValue(OSNPCVersion, OSVersion.GetValue())
 		NPC.AddSpell(Maintainer)
 	endif
 	dlog(1,SetOutfitLog)
 endfunction
 Bool Function CheckEligibility(Actor NPC, Bool PreCheck=False)
+	;Lets try the script updater here...
+	If NPC.GetValue(OSNPCVersion)!=OSVersion.GetValue()
+		dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" attempting to update maintenance spell")
+		if NPC.HasSpell(Maintainer)
+			NPC.RemoveSpell(Maintainer)
+		endif
+		if !NPC.HasSpell(Maintainer)
+			NPC.AddSpell(Maintainer)
+		endif
+	endif
+
 	;dlog(1,NPC+NPC.GetLeveledActorBase().GetName()+" is being processed by CheckEligibility()")
 	If NPC.IsDisabled()|| NPC.IsDeleted()||NPC.IsChild()||NPC.IsDead()||(NPC == PlayerRef )
 		If Precheck

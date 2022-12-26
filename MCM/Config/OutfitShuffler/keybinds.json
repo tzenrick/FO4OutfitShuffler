@@ -1,16 +1,6 @@
 {
   "modName": "OutfitShuffler",
   "keybinds": [
-	{
-      "id": "DebugHotkey",
-      "desc": "ForDebugging",
-	  "action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "DebugFunction",
-			"params": []
-	  }	
-    },
     {
       "id": "UpdateAllOutfits",
       "desc": "This hotkey forces an outfit change for all NPCs.",
