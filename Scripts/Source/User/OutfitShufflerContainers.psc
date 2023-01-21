@@ -18,8 +18,10 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 				BadContainer=True
 			endif
 		endif
-		If akSourceContainer.IsOwnedBy(PlayerRef)
-			BadContainer=True
+		if akSourceContainer
+			If akSourceContainer.IsOwnedBy(PlayerRef)
+				BadContainer=True
+			endif
 		endif
 		if (akSourceContainer && !BadContainer && OSTempContainer.GetSize()==0) && (!(akSourceContainer == akSourceContainer as Actor)||((akSourceContainer == akSourceContainer as Actor)&&(akSourceContainer as Actor).IsDead()))
 			MyOnlyContainer=akSourceContainer

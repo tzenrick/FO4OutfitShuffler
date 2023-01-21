@@ -4,7 +4,7 @@
 	"minMcmVersion": 1,
 	"content": [
 		{
-			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v7.6</font>",
+			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v7.8</font>",
 			"type": "text",
 			"html": true
 		},
