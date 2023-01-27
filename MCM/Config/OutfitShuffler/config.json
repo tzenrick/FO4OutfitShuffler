@@ -28,69 +28,25 @@
 			"type": "section"
 		},
 		{
-			"id": "DontChangeItem:Global",
-			"text": "DontChange Item",
+			"id": "OSItemsAdd:Global",
+			"text": "Add Do/Dont BodyGen/Scale/Outfit Items",
 			"type": "button",
-			"help": "Add 25 DontChange items to player inventory.",
+			"help": "Add OutfitShuffler special items to player inventory.",
 			"action": {
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|0800",
-			"function": "AddDontChangeItem"
+			"function": "OSItemsAdd"
 			}
 		},
 		{
-			"id": "AlwaysChangeItem:Global",
-			"text": "AlwaysChange Item",
+			"id": "OSItemsRemove:Global",
+			"text": "Remove Do/Dont BodyGen/Scale/Outfit Items",
 			"type": "button",
-			"help": "Add 25 AlwaysChange items to player inventory.",
+			"help": "Remove OutfitShuffler special items from player inventory.",
 			"action": {
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|0800",
-			"function": "AddAlwaysChangeItem"
-			}
-		},
-		{
-			"id": "DontBodyGenItem:Global",
-			"text": "DontBodyGen Item",
-			"type": "button",
-			"help": "Add 25 DontBodyGen items to player inventory.",
-			"action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "AddDontBodyGenItem"
-			}
-		},
-		{
-			"id": "AlwaysBodyGenItem:Global",
-			"text": "AlwaysBodyGen Item",
-			"type": "button",
-			"help": "Add 25 AlwaysBodyGen items to player inventory.",
-			"action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "AddAlwaysBodyGenItem"
-			}
-		},
-		{
-			"id": "DontScaleItem:Global",
-			"text": "DontScale Item",
-			"type": "button",
-			"help": "Add 25 DontScale items to player inventory.",
-			"action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "AddDontScaleItem"
-			}
-		},
-		{
-			"id": "AlwaysScaleItem:Global",
-			"text": "AlwaysScale Item",
-			"type": "button",
-			"help": "Add 25 AlwaysScale items to player inventory.",
-			"action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "AddAlwaysScaleItem"
+			"function": "OSItemsRemove"
 			}
 		},
 		{
@@ -977,6 +933,16 @@
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|800",
 			"function": "OnInit"
+		  }
+		},
+		{
+		  "text": "Reset ALL NPC data.",
+		  "type": "button",
+		  "help": "Removes all saved OutfitShuffler special items, and cleans out F4SE\Plugins\OutfitShuffler\OSNPCData.ini",
+		  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|800",
+			"function": "ResetStoredNPCs"
 		  }
 		}
 	]

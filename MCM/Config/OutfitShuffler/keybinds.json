@@ -47,17 +47,7 @@
 	  "action": {
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|0800",
-			"function": "RandomBodyGen",
-			"params": []
-	  }	
-    },
-	{
-      "id": "NoisyConsole",
-      "desc": "This prints and logs HeadParts from targeted NPC.",
-	  "action": {
-			"type": "CallFunction",
-			"form": "OutfitShuffler.esl|0800",
-			"function": "NoisyConsole",
+			"function": "MCMBodyGen",
 			"params": []
 	  }	
     }
