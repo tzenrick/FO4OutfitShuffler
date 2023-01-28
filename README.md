@@ -57,7 +57,24 @@ To configure OutfitShuffler, access the mod's settings through the Mod Configura
     Advanced Settings: Allows you to customize the frequency of outfit changes, specify which NPCs should be affected by the mod, and include or exclude specific items from outfit changes.
 	
 Changelog:
-	7.3 Lots of cleaning, speed improvements, logging improvements (Disable if you don't need it. Seriously.) Much better Devious Devices/Real Handcuffs compatibility.
+	8.1.0001 Just documentation updates. 
+	
+	8.1 So now it's using GetSlotMask to try to prevent outfit pieces from replacing each other. Seems to respect Devious Devices, Real Handcuffs, and SafeItems better.
+	Added a hotkey to spawn a captive from Commonwealth Captives (if available) or a random female settler.
+
+	There's a new section available for use, [OSRestrictedFurniture], and I've included INI files for some of the more popular restrictive furniture. I also threw in Cryopods, Memory Loungers, toilets, etc.
+
+	8.0c A wild settings file appeared! This is the "Hard Save data file update, with Additional Optimizations" update. That's a mouthful. Outfits and Weapons are now saved to a file, and reloaded when NPCs come back into range. I highly recommend having Buffout 4 installed, as it uses a RAM buffer instead of going to disk for every INI check. The Hard Save has the additional feature of maintaining outfits across savegames. You can also manually edit loadouts. I made the unilateral decision to use a file, over an array tied to the script, for those reasons. I added a function at the bottom of the MCM to Clear OSNPCData. It will remove any OutfitShuffler special items from all NPCs in OSNPCData, and delete their outfits from the file.
+
+	I removed a lot of repitition from the code by making a lot of the functions global, to call them from any script. I am passing properties, arrays, and formlists around, like joints at a Grateful Dead concert.
+
+	I have not updated the documentation yet. I hate documentation. I spent years writing technical documentation. Would anyone like to update my documentation for me?
+
+	7.7 Fixed AAF Doppelgangers. Fixed an annoying bug that repeated a message unnecessarily.
+	7.6.1 Fixed a glitch in the updater code. It was adding the maintenance spell to ALL the NPCs, then relying on the maintenance to remove itself. The maintenance script was removing itself, but not before doing the maintenance.
+	7.6 Removed Debug hotkey. Added variables and checks to handle updating NPC scripts when upgrading the mod.
+	7.5 DD Compatibility was breaking things, and I had to fix it. Left a debug function in, that teleports NPCs to your position. Not recommended in firefights.
+	7.4 Hammered out a little more speed in the outfit change routine.  Changed the scan routine to prioritize based on FOV and distance.7.3 Lots of cleaning, speed improvements, logging improvements (Disable if you don't need it. Seriously.) Much better Devious Devices/Real Handcuffs compatibility.
 
 	7.2 Container management is much cleaner now. It's SUPPOSED to ignore the container used by Dave's In-Game ESP Explorer, now. I added rudimentary Devious Devices Support. I also added in a NoNudes option. It should be more aggressive at keeping some sort of clothing on the NPC's, unless they've been hit with the DontChange keyword. ** It is advised by the authors, and other users, that Devious Devices and NPCs don't mix well. I tried.
 
@@ -87,13 +104,3 @@ Changelog:
 	6.21 Just outfit sets. Don't bother unless you're adding Classy Chassis outfits to your collection.
 
 	6.22 Changed directory structure to hopefully make it MO2 friendly.
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-
-    Terms
-    Privacy
-    Security
-    Status
-    Docs
-    Contact GitHu

@@ -50,6 +50,16 @@
 			"function": "MCMBodyGen",
 			"params": []
 	  }	
+    },
+	{
+      "id": "SpawnCaptive",
+      "desc": "Uses Commonwealth Captives (if installed) to spawn a captive at the player.",
+	  "action": {
+			"type": "CallFunction",
+			"form": "OutfitShuffler.esl|0800",
+			"function": "SpawnCaptive",
+			"params": []
+	  }	
     }
   ]
 }

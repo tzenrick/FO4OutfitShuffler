@@ -3,7 +3,7 @@ Scriptname OutfitShufflerMaintainer extends ActiveMagicEffect
 ;got higher than giraffe tits again. Came through and prettied the logging, and made it more consistent, with what I'm trying to achieve, with the main script.
 ;Imported Properties from ESP
 
-Float NPCVersionToSet = 8.0
+Float NPCVersionToSet = 8.1
 Import OutfitShuffler
 Import LL_FourPlay
 Import Game

@@ -143,9 +143,11 @@ Event OnInit()
 	Self.CancelTimer(TimeID)
 	OSSuspend.SetValueInt(0)
 	OSAllItems.Revert()
-	PlayerRef.RemoveSpell(ContainersSpell)
+	if PlayerRef.HasSpell(ContainersSpell)
+		PlayerRef.RemoveSpell(ContainersSpell)
+	endif
 ;Setting OSVersion
-	OSVersion.Setvalue(8.0)
+	OSVersion.Setvalue(8.1)
 	If dummyval>0
 		return
 	endif
@@ -421,7 +423,9 @@ Function EquipInOrder(Actor NPCv) Global
 	While (i < InvItems.Length)
 		Form akItem = InvItems[i]
 		If (akItem as Armor) && akItem.getformid()>0x06FFFFFF && !IsDeviousDevice(akItem) || SafeForm(NPCv).HasForm(akItem as ObjectReference)
-			NPCv.equipitem(akItem)
+			If !IsOverwritingExisting(NPCv,akItem as Armor)
+				NPCv.equipitem(akItem)
+			endif
 		endif
 	i += 1
 	endwhile
@@ -431,8 +435,10 @@ Function EquipInOrder(Actor NPCv) Global
 	While (i < InvItems.Length)
 		Form akItem = InvItems[i]
 		if SafeForm(NPCv).HasForm(akItem as ObjectReference)
-			NPCv.EquipItem(akItem)
+			If !IsOverwritingExisting(NPCv,akItem as Armor)
+				NPCv.equipitem(akItem)
 			endif
+		endif
 	i += 1
 	endwhile
 
@@ -770,7 +776,9 @@ Function RescanOutfitsINI()
 ;clear parts lists
 	OSAllItems.Revert()
 	While counter < PForm.Length
-		PForm[counter].revert()
+		if PForm[counter]!=None
+			PForm[counter].revert()
+		endif
 		counter += 1
 	endwhile
 ;Get Outfit INI Files
@@ -780,7 +788,7 @@ Function RescanOutfitsINI()
 	While j<Keys.Length
 		int ConfigOptionsInt=GetCustomConfigOption_UInt32(MasterINI, "InputFiles", Keys[j]) as int
 		if ConfigOptionsInt > 0
-			dlog(2,"Scanning for new outfits...      "+j+"/"+keys.length)
+			dlog(2,"Scanning for new outfits: "+(j+1)+"/"+keys.length)
 			ScanINI(Keys[j])
 		endif
 	j += 1
@@ -850,7 +858,6 @@ Function ScanINI(String INItoCheck)
 		String[] ChildINISections=GetCustomConfigSections(INIFile) as String[]
 		int ChildINISectionCounter=0
 		int WholeINI
-		String WholeINIDebug
 		if ChildINISections.Length > 0
 			While ChildINISectionCounter<ChildINISections.Length
 				Var[] ChildConfigOptions=GetCustomConfigOptions(INIFile, ChildINISections[ChildINISectionCounter])
@@ -881,11 +888,10 @@ Function ScanINI(String INItoCheck)
 						if FormToAdd > 0
 							If PString.Find(ChildINISections[ChildINISectionCounter]) > -1
 								Form TempItem=Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter])
-								PForm[PString.Find(ChildINISections[ChildINISectionCounter])].AddForm(TempItem)
 								if TempItem!=None
-									If  !IsDeviousDevice(TempItem)
-										OSAllItems.AddForm(Game.GetFormFromFile(FormToAdd,ChildKeys[ChildKeysCounter]))
-									endif
+									PForm[PString.Find(ChildINISections[ChildINISectionCounter])].AddForm(TempItem)
+									;dlog(1,INItoCheck+" added "+TempItem.GetName()+" from "+ChildKeys[ChildKeysCounter]+" to "+PString[PString.Find(ChildINISections[ChildINISectionCounter])]+PForm[PString.Find(ChildINISections[ChildINISectionCounter])])
+									OSAllItems.AddForm(TempItem)
 								endif
 								ScanINICounter+=1
 							endIf
@@ -1122,8 +1128,13 @@ Function BuildOutfitArray()
 	PChance.Add(0)
 	;53
 	PString.Add("OSRestrictedFurniture")
-	PForm.Add(OSRestrictedFurniture)
+	PForm.Add(GetFormFromFile(0x85f,"OutfitShuffler.esl") as FormList)
 	PChance.Add(0)
+	Int i
+	While i < PForm.Length
+		dlog(1,"PString="+PString[i]+" Pform="+Pform[i]+" PChance="+PChance[i])
+		i+=1
+	endwhile
 	dlog(2,"BuildOutfitArray() complete.")
 endfunction
 
@@ -1131,8 +1142,10 @@ int Function CountParts()
 	Int OutfitPartsCounter
 	Int OutfitPartsAdder
 	While OutfitPartsCounter < PForm.Length
-		OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
-		OutfitPartsCounter += 1
+		if PForm[OutfitPartsCounter]!=None
+			OutfitPartsAdder=OutfitPartsAdder+PForm[OutfitPartsCounter].GetSize()
+		endif
+		OutfitPartsCounter+=1
 	endwhile
 	CountedParts=OutfitPartsAdder
 	return OutfitPartsAdder
@@ -1479,7 +1492,6 @@ FormList Function SafeForm(Actor NPC) Global
 endfunction
 
 Function BuildOutfitFromParts(Actor NPC) Global
-	
 	;Run a Cleanup, first
 	UnequipItems(NPC)
 	Outfit EO=GetFormFromFile(0x81f, "OutfitShuffler.esl") as Outfit
@@ -1517,14 +1529,20 @@ Function BuildOutfitFromParts(Actor NPC) Global
 		While RandomItem==None
 			RandomItem = OSPF[OSPS.Find(NPCSex+"FullBody")].GetAt(RandomInt(0,OSPF[OSPS.Find(NPCSex+"FullBody")].GetSize()))
 		endwhile
-		NPC.EquipItem(RandomItem)
+		if RandomItem!=None && (RandomItem as Armor)
+			if !IsOverwritingExisting(NPC, RandomItem as Armor)
+				NPC.EquipItem(RandomItem)
+			endif
+		endif
 	else
 		Int Counter=1
 		While counter < OSPF.Length
 			If (StringFind(OSPS[Counter], NPCSex) == 0) && (StringFind(OSPS[Counter], "FullBody") == -1) && OSPC[Counter]>1 && OSPF[Counter].GetSize()>0 && RandomInt(1,99)<OSPC[counter]
 				Form RandomItem = OSPF[counter].GetAt(RandomInt(0,OSPF[Counter].GetSize())) as Form
-				If RandomItem != None
-					NPC.EquipItem(RandomItem)
+				if RandomItem!=None && (RandomItem as Armor)
+					if !IsOverwritingExisting(NPC, RandomItem as Armor)
+						NPC.EquipItem(RandomItem)
+					endif
 				endif
 			endif
 		counter += 1
@@ -1609,7 +1627,14 @@ Function LoadNPC(Actor NPCv) Global
 			Form TempForm=GetFormFromFile(HexStringToInt(NPCvKey[i]),NPCvValue[i] as String)
 			if TempForm!=None
 				if !NPCv.IsEquipped(TempForm) &&(XYSafe_Items.HasForm(TempForm) || XXSafe_Items.HasForm(TempForm)||OS_AllItems.HasForm(TempForm)||Weapons_List.HasForm(TempForm)||IsDeviousDevice(TempForm))
-					NPCv.EquipItem(TempForm)
+					if TempForm!=None && (TempForm as Armor)
+						if !IsOverwritingExisting(NPCv, TempForm as Armor)
+							NPCv.EquipItem(TempForm)
+						endif
+					endif
+					if TempForm!=None && !(TempForm as Armor)
+						NPCv.EquipItem(TempForm)
+					endif
 				endif
 			endif
 			i+=1
@@ -1620,12 +1645,38 @@ Function LoadNPC(Actor NPCv) Global
 endfunction
 
 bool Function IsInRestrictedFurniture(actor NPCv) global
-	OutfitShuffler OS
 	FormList RestrictedFurniture=GetFormFromFile(0x85f, "outfitshuffler.esl") as Formlist
+;	dlog(1,NPCv+NPCv.GetLeveledActorBase().GetName()+" is checking if IsInRestrictedFurniture. OSRestrictedFurniture is "+RestrictedFurniture.GetSize())
 	If NPCv.GetFurnitureReference()!=None
+;		dlog(1,NPCv+NPCv.GetLeveledActorBase().GetName()+" is in furniture "+NPCv.GetFurnitureReference().GetBaseObject().GetName())
 		if RestrictedFurniture.HasForm(NPCv.GetFurnitureReference().GetBaseObject())
-			dlog(1,NPCv+NPCv.GetLeveledActorBase().GetName()+" is in restricted furniture "+NPCv.GetFurnitureReference().GetBaseObject().GetName())
-			return false
+;			dlog(1,NPCv+NPCv.GetLeveledActorBase().GetName()+" is in restricted furniture "+NPCv.GetFurnitureReference().GetBaseObject().GetName())
+			return true
 		endif
+	endif
+	return false
+endfunction
+
+bool Function IsOverwritingExisting(Actor NPCv, Armor testitem) global
+	Form[] InvItems = NPCv.GetInventoryItems()
+	int i=0
+	While (i < InvItems.Length)
+		Form akItem = InvItems[i]
+		If (testitem as armor) && LogicalAnd(akitem.GetSlotMask(), testitem.GetSlotMask())
+			return true
+		endif
+	i += 1
+	EndWhile
+	return false
+endfunction
+
+function SpawnCaptive()
+	if IsPluginInstalled("Commonwealth Captives.esp")
+		ScriptObject CCMain = GetFormFromFile(0x2ecb,"Commonwealth Captives.esp") as ScriptObject
+		Var[] Temp=New Var[1]
+		Temp[0]=PlayerRef as Actor
+		CCMain.CallFunction("CreateCaptive", Temp)
+	else
+		dlog(2, "Placing random female settler"+Game.GetPlayer().PlaceAtMe(GetFormFromFile(0x14CEA9,"Fallout4.esm"),1))
 	endif
 endfunction

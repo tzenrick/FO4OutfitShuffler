@@ -278,6 +278,15 @@
 			}
 		},
 		{
+			"id": "SpawnCaptive",
+			"text": "Spawn Captive",
+			"type": "hotkey",
+			"help": "Uses Commonwealth Captives (if installed) to spawn a captive at the player.",
+			"valueOptions": {
+			"allowModifierKeys": true
+			}
+		},
+		{
 			"text": "Logging",
 			"type": "section"
 		},

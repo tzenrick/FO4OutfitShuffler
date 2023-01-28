@@ -50,25 +50,29 @@ Scanning
 
 Hotkeys
 
-	ChangeNow
+	Change Now
 		Changes the outfit on the targeted NPC as soon as possible.
 		This shuffles one NPC.
 
-	UpdateAllOutfits
+	Update All Outfits
 		Shuffle All Outfits on Next Short Timer
 		This shuffles everything.
 
-	DontChange
+	Dont Change
 		Toggle Ignore this NPC/Ignore Faction exclusion
 		This toggles AlwaysChange DontChange or default changing behavior.
 
-	DebugNPC
+	Debug NPC
 		Output Debug Information for NPC
 		Output NPC Status
 
-	RandomBodyGen
+	Random BodyGen
 		Change to a random BodyGen.
 		Change targeted NPC to a random bodygen without changing the outfit.
+		
+	Spawn Captive
+		Spawns a captive from Commonwealth Captives at the player's location.
+		If Commonwealth Captives is not installed, it will spawn a random female settler.
 
 Logging
 
