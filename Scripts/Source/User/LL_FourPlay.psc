@@ -4,7 +4,7 @@ Scriptname LL_FourPlay Native Hidden
 ;	Shared community library of utility function from LoverLab distributed with FourPlay resources as a F4SE plugin with sources included
 ;
 
-;	Version 42 for runtime 1.10.163	2021 09 13 by jaam and Chosen Clue and EgoBallistic and Fedim
+;	Version 43 for runtime 1.10.163	2021 09 13 by jaam and Chosen Clue and EgoBallistic and Fedim
 
 ;	Runtime version: This file should be runtime neutral. The accompanying F4SE plugin (ll_fourplay_1_10_163.dll) is NOT!
 ;		You need to always use a plugin corresponding with the game version you play.
@@ -17,7 +17,7 @@ Scriptname LL_FourPlay Native Hidden
 
 ; Returns the version of this script (when someone has not forgotten to update it :) )
 Float Function GetLLFPScriptVersion() global
-	return 42.0
+	return 44.0
 endFunction
 
 ; Returns the version of the plugin and servers to verify it is properly installed.
@@ -251,6 +251,14 @@ bool Function MfgCopyMorphs(Actor a0, Actor a1) native global
 ;	Apply a set of MFG morphs to an actor.  Morph ID morphIDs[x] will be set to values[x]
 bool Function MfgApplyMorphSet(Actor akActor, int[] morphIDs, int[] values) native global
 
+; Return an Actor's actor flags (not the same as the Form flags)
+Int Function GetActorFlags(Actor akActor) native global
+
+;   Reset an actor's persistent Essential / Protected data
+;	Calling Actor.SetEssential() overrides the actor base value. Changing the state on the actor base will no longer have any effect, and
+;	neither will the Essential flag on Aliases.  This function resets the override so ActorBase and alias flags will work again.
+bool Function ResetActorEssential(Actor akActor) native global
+
 ;
 ;	Collision functions
 ;	===================
@@ -302,7 +310,18 @@ Bool Function IsPersistent(Form akForm) native global
 ; Set a form persistent or not. Returns false if form does not exist
 Bool Function SetPersistent(Form akForm, bool akFlag) native global
 
-;
+; Return an array of all the forms in a FormList
+Form[] Function FormListToArray(FormList akFormList) native global
+
+; Return the form with the given formID from any type of plugin (esm, esl, esp)
+Form Function GetFormFromPlugin(String modName, Int formID) native global
+
+; Return an array of forms given an array of plugin names and an array of form IDs
+Form[] Function GetFormArray(String[] modNames, Int[] formIDs) native global
+
+; Populate a formlist with the forms given an array of plugin names and a corresponding array of form IDs
+Function PopulateFormlist(FormList akFormList, String[] modNames, Int[] formIDs) native global
+
 ;	Misc functions
 ;	==============
 ;
@@ -340,4 +359,36 @@ int Function SetVolumeWav(int volumeA, int volumeB) native global
 ;	Sounds should be in the "Data\Sound\Voice\PluginName.esp\"
 String Function VoiceMessage(String PluginName, String SectionText) native global
 
+;
+;	INI setting functions
+;	=====================
+;
+;	Functions to retrieve INI settings, e.g. Fallout4.ini, Fallout4Prefs.ini, Fallout4Custom.ini, mod .ini files in Data folder
+;	These functions retrieve the settings from the game engine, not from the INI files themselves.
+;	Parameter is the .ini setting name and section, fSettingName:SectionName.  For example, fMinCurrentZoom:Camera
+;	Note that typing is strict, e.g. you cannot call GetINIFloat on an Int setting
+;
+; Return Float setting value or 0.0 if not found
+float Function GetINIFloat(string ini) native global
 
+; Return Int setting value or 0 if not found
+int Function GetINIInt(string ini) native global
+
+; Return Bool setting value or false if not found
+Bool Function GetINIBool(string ini) native global
+
+; Return String setting value or NONE if not found
+String Function GetINIString(string ini) native global
+
+;
+;	Animation functions
+;	===================
+;
+;	Functions to play animations on actors. They do basic sanity checking on the inputs so that None idles and actors,
+;	actors who are deleted or disabled, and actors with no AI middle process will not attempt to play idles.
+;
+; Make one actor play an idle
+Function PlayIdle(Actor akActor, Form akIdle) native global
+
+; Make multiple actors play idles, in synch
+Function PlayMultipleIdles(Actor[] akActor, Form[] akIdle) native global

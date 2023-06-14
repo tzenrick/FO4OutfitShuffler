@@ -3,7 +3,7 @@ Scriptname OutfitShufflerMaintainer extends ActiveMagicEffect
 ;got higher than giraffe tits again. Came through and prettied the logging, and made it more consistent, with what I'm trying to achieve, with the main script.
 ;Imported Properties from ESP
 
-Float NPCVersionToSet = 8.1
+Float NPCVersionToSet = 8.5
 Import OutfitShuffler
 Import LL_FourPlay
 Import Game
@@ -143,9 +143,6 @@ Event OnTimer(int TimerID)
 			NPC.RemoveSpell(Maintainer)
 		endif
 	endif
-	if IsInRestrictedFurniture(NPC)
-		return
-	endif
 	If TimerID==tID
 		While LocalHold
 			wait(1.0)
@@ -172,7 +169,7 @@ Event OnTimer(int TimerID)
 		Bool LoadNotShuffle
 		Var[] TempVal = New Var[0]
 		TempVal = GetCustomConfigOptions(OSData, IntToHexString(NPC.GetFormID()))
-;		dlog(1,"OnTimer()"+NPC+NPC.GetLeveledActorBase().GetName()+" Checking for NPC Data. GetCustomConfigOptions Item Count="+TempVal.Length)
+		dlog(1,"OnTimer()"+NPC+NPC.GetLeveledActorBase().GetName()+" Checking for NPC Data.")
 		if TempVal!=None
 			Var[] TempVal2=New Var[0]
 			TempVal2=VarToVarArray(TempVal[0])
@@ -188,7 +185,10 @@ Event OnTimer(int TimerID)
 				Return
 			endif
 		endif
-
+;8.2:  moved furniture check to after LoadNPC() so that NPCs in furniture will be maintained, but not changed.
+		if IsInRestrictedFurniture(NPC)
+			return
+		endif
 
 		If NPC.GetValue(OSMaintWait)==1 && (NPC.GetValue(OSMaintTime)+(GetModSettingInt("OutfitShuffler", "iLongMult:General") as Int)*(GetModSettingFloat("OutfitShuffler", "fShortTime:General") as Float)*0.00069)>GetCurrentGameTime()
 			NPC.SetValue(OSMaintWait,0)
@@ -196,7 +196,7 @@ Event OnTimer(int TimerID)
 			While !NPC.Is3DLoaded() || NPC.GetValue(OSMaintWait)>0 || OSSuspend.GetValueInt() == 1 || !CheckAAFSafe(NPC);|| NPC.GetFurnitureReference()!=None 
 				Wait(1.0)
 			endwhile
-				dlog(1,"OnTimer()"+NPC+NPC.GetLeveledActorBase().GetName()+" is being maintained")
+			dlog(1,"OnTimer()"+NPC+NPC.GetLeveledActorBase().GetName()+" is being maintained")
 			EveryDayImShufflin()
 		endif
 		NPC.AddInventoryEventFilter(None)
@@ -218,7 +218,7 @@ endevent
 Event OnItemUnequipped(Form akBaseObject, ObjectReference akReference)
 	if IsInRestrictedFurniture(NPC)
 		return
-	endif
+			endif
 	if (akBaseObject!=None||akReference!=None)&&NPC!=None
 		if NPC.GetValue(OSMaintWait)==0 && CheckAAFSafe(NPC) && !PowerArmorCheck(NPC) && OSSuspend.GetValueInt()==0
 			NPC.SetValue(OSMaintWait,1)
@@ -229,6 +229,9 @@ Event OnItemUnequipped(Form akBaseObject, ObjectReference akReference)
 				If akItem.getformid()<0x07000000 && !(GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)
 					if OSAllItems.HasForm(akItem as ObjectReference) || SafeForm(NPC).HasForm(akItem as ObjectReference) || IsDeviousDevice(akItem)
 						NPC.equipitem(akItem)
+						if GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 3
+							dlog(1,"OnItemUnequipped()-RecognizedItems "+NPC+NPC.GetLeveledActorBase().GetName()+" is equipping "+akItem+akItem.GetName())
+						endif
 						return
 					else
 						NPC.removeitem(akItem,-1)
@@ -237,22 +240,36 @@ Event OnItemUnequipped(Form akBaseObject, ObjectReference akReference)
 				endif
 				If akItem.getformid()>0x06ffffff || (akItem.getformid()<0x07000000 && (GetModSettingBool("OutfitShuffler", "bAllowDLC:General") as Bool)) || OSAllItems.HasForm(akItem as ObjectReference) || SafeForm(NPC).HasForm(akItem as ObjectReference)
 					NPC.equipitem(akItem)
+					if GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 3
+						dlog(1,"OnItemUnequipped()-RegularItems "+NPC+NPC.GetLeveledActorBase().GetName()+" is equipping "+akItem+akItem.GetName())
+					endif
 					return
 				endif
 			endif
 			if SafeForm(NPC).HasForm(akItem as ObjectReference)
 				NPC.EquipItem(akItem)
+				if GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 3
+					dlog(1,"OnItemUnequipped()-SafeItems "+NPC+NPC.GetLeveledActorBase().GetName()+" is equipping "+akItem+akItem.GetName())
+				endif
 				return
 			endif
 			if IsDeviousDevice(akItem)
 				NPC.EquipItem(akItem)
+				if GetModSettingInt("OutfitShuffler", "iLogLevel:General") as int == 3
+					dlog(1,"OnItemUnequipped()-DeviousItems "+NPC+NPC.GetLeveledActorBase().GetName()+" is equipping "+akItem+akItem.GetName())
+				endif
 				return
 			endif
-			SaveNPC(NPC)
+			;SaveNPC(NPC)
 			NPC.SetValue(OSMaintWait,0)
 			NPC.AddInventoryEventFilter(None)
 		endif
 	endif
+endEvent
+
+Event OnDeath(Actor Killer)
+	ResetCustomConfigOptions(OSData, IntToHexString(NPC.GetFormID()), None, None)
+	NPC.RemoveSpell(Maintainer)
 endEvent
 
 Function EveryDayImShufflin()
@@ -275,7 +292,7 @@ Function EveryDayImShufflin()
 
 	endif
 
-	SaveNPC(NPC)
+	;SaveNPC(NPC)
 	NPC.SetValue(OSMaintTime, GetCurrentGameTime())
 	NPC.SetValue(OSMaintWait,0)
 	NPC.AddInventoryEventFilter(None)
