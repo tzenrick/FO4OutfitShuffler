@@ -4,7 +4,7 @@
 	"minMcmVersion": 1,
 	"content": [
 		{
-			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>v8.3</font>",
+			"text": "<font size='24'>Outfit Shuffler</font> <font id='version' size='6'>9.0</font>",
 			"type": "text",
 			"html": true
 		},
@@ -16,7 +16,7 @@
 			"id": "Rescan:Global",
 			"text": "Rescan Outfits",
 			"type": "button",
-			"help": "Rescan all outfits configs from disk. Close menu after toggling to update.",
+			"help": "Rescan all outfits configs from disk.",
 			"action": {
 			"type": "CallFunction",
 			"form": "OutfitShuffler.esl|0800",
@@ -126,7 +126,7 @@
 			"text": "Enable OneShot",
 			"help": "Change NPC's once, but not again without user action.",
 			"type": "switcher",
-			"id": "bOneShot:General",
+			"id": "bOutfitOneShot:General",
 			"valueOptions": {
 				"sourceType": "ModSettingBool"
 			}
@@ -199,12 +199,12 @@
 			"text": "Scanning Distance",
 			"help": "How many units away to scan.",
 			"type": "slider",
-			"id": "fScanRange:General",
+			"id": "iScanningDistance:General",
 			"valueOptions": {
-				"sourceType": "ModSettingFloat",
-				"min": 500.0,
-				"max": 30000.0,
-				"step": 250.0
+				"sourceType": "ModSettingInt",
+				"min": 500,
+				"max": 30000,
+				"step": 250
 			}
 		},
 		{
@@ -215,19 +215,19 @@
 			"text": "Short Timer",
 			"help": "Puts new people in the scan range into new outfits.",
 			"type": "slider",
-			"id": "fShortTime:General",
+			"id": "iShortTimer:General",
 			"valueOptions": {
-				"sourceType": "ModSettingFloat",
-				"min": 1.0,
-				"max": 600.0,
-				"step": 1.0
+				"sourceType": "ModSettingInt",
+				"min": 1,
+				"max": 600,
+				"step": 1
 			}
 		},
 		{
 			"text": "Multiplier",
 			"help": "How many times to run the short timer before changing EVEYONE'S outfits, regardless of what they are wearing.",
 			"type": "slider",
-			"id": "iLongMult:General",
+			"id": "iLongTimer:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 5,
@@ -244,15 +244,6 @@
 			"text": "Changes the outfit on the targeted NPC as soon as possible.",
 			"type": "hotkey",
 			"help": "This shuffles one NPC.",
-			"valueOptions": {
-			"allowModifierKeys": true
-			}
-		},
-		{
-			"id": "UpdateAllOutfits",
-			"text": "Shuffle All Outfits on Next Short Timer",
-			"type": "hotkey",
-			"help": "This shuffles everything.",
 			"valueOptions": {
 			"allowModifierKeys": true
 			}
@@ -317,7 +308,7 @@
 			"text": "Weapons",
 			"help": "Chance of New Weapons from Data/F4SE/Plugins/OutfitShuffler/WeaponsList.ini.",
 			"type": "slider",
-			"id": "iChanceWeaponsList:General",
+			"id": "iChanceWeapons:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -571,6 +562,29 @@
 			"help": "Chance of RightLegArmorSlot (Future/Custom Use?)",
 			"type": "slider",
 			"id": "iChanceXXRightLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+		{
+			"text": "TorsoArmor",
+			"help": "Chance of TorsoArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXXTorsoArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},		{
+			"text": "Mouth",
+			"help": "Chance of MouthSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXXMouth:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
@@ -867,6 +881,29 @@
 			"help": "Chance of RightLegArmorSlot (Future/Custom Use?)",
 			"type": "slider",
 			"id": "iChanceXYRightLegArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},
+				{
+			"text": "TorsoArmor",
+			"help": "Chance of TorsoArmorSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYTorsoArmor:General",
+			"valueOptions": {
+				"sourceType": "ModSettingInt",
+				"min": 0,
+				"max": 100,
+				"step": 1
+			}
+		},		{
+			"text": "Mouth",
+			"help": "Chance of MouthSlot (Future/Custom Use?)",
+			"type": "slider",
+			"id": "iChanceXYMouth:General",
 			"valueOptions": {
 				"sourceType": "ModSettingInt",
 				"min": 0,
