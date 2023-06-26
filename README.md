@@ -57,7 +57,9 @@ To configure OutfitShuffler, access the mod's settings through the Mod Configura
     Advanced Settings: Allows you to customize the frequency of outfit changes, specify which NPCs should be affected by the mod, and include or exclude specific items from outfit changes.
 	
 Changelog:
-	8.1.0001 Just documentation updates. 
+	9.0 Moved all outfit assignment, saving, and loading to Maintainer script from the Main script. Much, much, much faster. Outfit assignments are now being done almost in parallel, instead of serially.
+ 
+ 	8.1.0001 Just documentation updates. 
 	
 	8.1 So now it's using GetSlotMask to try to prevent outfit pieces from replacing each other. Seems to respect Devious Devices, Real Handcuffs, and SafeItems better.
 	Added a hotkey to spawn a captive from Commonwealth Captives (if available) or a random female settler.
