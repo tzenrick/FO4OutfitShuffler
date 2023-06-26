@@ -32,7 +32,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 			ContainerOutput = "Container="+akSourcecontainer
 		endif
 		Int RandomNumber=RandomInt(0,99)
-;		dLog(int dLogLevel,string LogMe, String AltShort="", String AltLong="")
+;		dLog(string LogMe, Severity=0, String AltShort="", String AltLong="")
 		if (((akSourceContainer && !BadContainer && OSTempContainer.GetSize()==0) \
 		&& !(akSourceContainer == akSourceContainer as Actor)\
 		&& (GetModSettingInt("OutfitShuffler", "iContainerLootChance:General") as Int>RandomNumber)))\
@@ -55,7 +55,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
 			Wait(RandomFloat(0.5,2.0))
 		endif
 		AddInventoryEventFilter(None)
-		dLog(1,ContainerOutput+"\nGot a RandomNumber="+RandomNumber+"\niContainerLootChance="+GetModSettingInt("OutfitShuffler", "iContainerLootChance:General")+"\niDeadBodyLootChance="+GetModSettingInt("OutfitShuffler", "iDeadBodyLootChance:General") , "[OSc]", "[.Container]")
+		;dLog(ContainerOutput+"\nGot a RandomNumber="+RandomNumber+"\niContainerLootChance="+GetModSettingInt("OutfitShuffler", "iContainerLootChance:General")+"\niDeadBodyLootChance="+GetModSettingInt("OutfitShuffler", "iDeadBodyLootChance:General") , 1,"[OSc]", "[.Container]")
 		OSSuspend.SetValueInt(0)
 	endif
 endEvent
