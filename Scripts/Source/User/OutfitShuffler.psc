@@ -8,8 +8,7 @@ Import MCM
 Import Math
 
 Actor Property PlayerRef Auto
-
-ActorValue Property OSBodyDone Auto 
+ 
 ActorValue Property OSMaintTime Auto
 ActorValue Property OSMaintWait Auto
 ActorValue Property OSNPCVersion Auto
@@ -20,7 +19,6 @@ FormList Property OSAllItems Auto
 FormList Property OSFactionsToIgnore Auto
 FormList Property OSGoodOutfits Auto
 FormList Property OSRestrictedFurniture Auto
-FormList Property OSSkins Auto
 FormList Property OSWeaponsList Auto
 
 FormList Property XXAccessory Auto
@@ -90,12 +88,14 @@ Quest Property MQ101WarNeverChanges Auto
 Quest Property OutfitShufflerQuest Auto
 Spell Property OSContainersSpell Auto
 Spell Property OSMaintenanceSpell Auto
-String Property OSDataFile Auto
 String Property OSLogFile Auto
 
 ;Property Arrays
 FormList Property OSListForms auto
 String[] Property OSListStrings auto
+
+String[] Property OSNPCid Auto
+String[] Property OSNPCdata Auto
 
 ;MCMVars
 Bool OSModEnabled
@@ -182,8 +182,10 @@ Event OnInit()
 	endif
 	dummyval+=1
 	UpdateVars()
+	PlayerRef.DispelSpell(OSContainersSpell)
+	PlayerRef.RemoveSpell(OSContainersSpell)
 	OSSuspend.SetValueInt(0)
-	OSVersion.SetValue(9.0)
+	OSVersion.SetValue(9.1)
 	dlog("OutfitShufflier Version: "+OSVersion.GetValue())
 	debug.notification("OutfitShuffler Initialized")
 	Self.StartTimer(OSShortTimer, TimerID)
@@ -209,8 +211,7 @@ Event OnTimer(Int TiD)
 	endWhile
 	
 	;diag
-	Wait(5)
-	dlog("OnTimer() is Checking Outfit Parts Count")
+	Wait(OSShortTimer)
 	If OSAllItems.GetSize()<1
 		RescanOutfitsINI()
 	endif
@@ -242,6 +243,8 @@ Function TimerTrap()
 EndFunction
 
 Function BuildOutfitArray()
+	OSNPCData.Clear()
+	OSNPCid.Clear()
 	dlog("Building Outfit Array",1)
 	OSSuspend.SetValueInt(1)
 	float RescanTimer=GetCurrentRealTime()
@@ -468,7 +471,8 @@ Function ScanINI(String INItoCheck)
 		endif
 		ChildINISectionCounter=0
 		if (ChildINISections.Length > 0)
-			dlog("ScanINI() Adding "+INIFile)
+			Int ProgressCounter=0
+			dlog("ScanINI() Adding "+INIFile,1)
  			While ChildINISectionCounter<ChildINISections.Length
 				Var[] ChildConfigOptions=GetCustomConfigOptions(INIFile, ChildINISections[ChildINISectionCounter])
 				Var[] ChildKeys=VarToVarArray(ChildConfigOptions[0])
@@ -492,7 +496,15 @@ Function ScanINI(String INItoCheck)
 							FormList TempList=OSListForms.GetAt(SectionIndex) as FormList
 							if TempItem!=None && TempList!=OSRestrictedFurniture
 								TempList.AddForm(TempItem)
-								OSAllItems.AddForm(TempItem)
+								If OSAllItems.Find(TempItem)==-1
+									OSAllItems.AddForm(TempItem)
+								endif
+								ProgressCounter+=1
+								Float ProgressPercentage=(ProgressCounter*100 as Float)/(WholeINI as Float)
+								Int ProgressPercentageRounded=ProgressPercentage as int
+								If ProgressPercentageRounded%10==0&&WholeINI>50
+									debug.notification("[OS]"+INIFile+" "+ProgressPercentageRounded+"% complete")
+								endif
 							endif
 							ScanINICounter+=1
 						endIf
@@ -523,7 +535,6 @@ ObjectReference[] ActorOutArray
 
 function ScanNPCs()
 	UpdateVars()
-	dlog("In ScanNPCs()")
 	While OSSuspend.GetValueInt() > 0
 		dlog("In ScanNPCs() while Suspended")
 		Wait(5)
@@ -538,9 +549,7 @@ function ScanNPCs()
 		int iActorArray = 0
 		if OSActorRaces.GetAt(RaceCounter) != None
 			kActorArray = PlayerRef.FindAllReferencesWithKeyword(OSActorRaces.GetAt(RaceCounter),OSScanningDistance)
-			dlog("ScanNPCs()-Found "+kActorArray.Length+" actors")
 			while iActorArray < kActorArray.Length && OSSuspend.GetValueInt() == 0
-				dlog("ScanNPCs()-ActorInArray Added: "+kActorArray[iActorArray]+" "+(kActorArray[iActorArray] as Actor).GetLeveledActorBase().GetName())
 				ActorInArray.Add(kActorArray[iActorArray] as ObjectReference)
 				iActorArray+=1
 			endwhile
@@ -549,20 +558,27 @@ function ScanNPCs()
 	endwhile
 	ActorOutArray = SortActors(ActorInArray) as Objectreference[]
 	int iActorArray=0
-	dlog("ScanNPCs()-ActorOutArray Length: "+ActorOutArray.Length)
 	While iActorArray<ActorOutArray.Length
 		Actor NPC=ActorOutArray[iActorArray] as Actor
 		If CheckEligibility(NPC)
-			dlog("ScanNPCs()-Adding Maintenance Spell to "+(iActorArray+1)+"/"+ActorOutArray.Length+" "+NPC+NPC.GetLeveledActorBase().GetName())
+			;dlog("ScanNPCs()-Adding Maintenance Spell to "+(iActorArray)+"/"+ActorOutArray.Length+" "+NPC+NPC.GetLeveledActorBase().GetName())
 			CountActors += 1
-			ActorsList += "("+(iActorArray+1)+")"+NPC.GetLeveledActorBase().GetName()+", "
+			ActorsList += "("+iActorArray+")"+NPC.GetLeveledActorBase().GetName()+", "
 			NPC.SetValue(OSMaintWait,0)
 			NPC.SetValue(OSMaintTime,GetCurrentGameTime())
-			NPC.AddSpell(OSMaintenanceSpell)
+			If !NPC.HasSpell(OSMaintenanceSpell)
+				NPC.AddSpell(OSMaintenanceSpell)
+			endif
 		endif
 	iActorArray+=1
 	endwhile
-	dlog("ScanNPCs()-Processed "+CountActors+" Actors: "+ActorsList)
+	;iActorArray=0
+	String LogTemp="Total Outfit Items="+OSAllItems.GetSize()+" ======== ScanNPCs()-Processed "+CountActors+" Actors: "+ActorsList+" ======== OSNPCid Records: "+OSNPCid.Length+"\n"
+	;While iActorArray<OSNPCid.Length
+	;	LogTemp+=(GetForm(HexStringToInt(OSNPCid[iActorArray])) as Actor).GetLeveledActorBase().GetName()+" NPCid="+OSNPCid[iActorArray]+" NPCdata="+OSNPCdata[iActorArray]+"\n"
+	;	iActorArray+=1
+	;endwhile
+	dlog(LogTemp)
 endFunction
 
 bool Function IsInRestrictedFurniture(Actor NPC)
@@ -575,7 +591,12 @@ bool Function IsInRestrictedFurniture(Actor NPC)
 endfunction
 
 Bool Function CheckEligibility(Actor NPC)
-	If NPC.GetValue(OSMaintWait)==999
+	If NPC.GetValue(OSMaintWait)==999||NPC.GetValue(OSMaintTime)==999||NPC.GetValue(OSNPCVersion)>OSVersion.GetValue()
+		if NPC.HasSpell(OSMaintenanceSpell)
+			NPC.RemoveSpell(OSMaintenanceSpell)
+		endif
+		ResetNPC(NPC)
+		NPC.AddSpell(OSMaintenanceSpell)
 		return true
 	endif
 	If NPC.GetValue(OSMaintWait) > 0
@@ -815,7 +836,6 @@ Function ListPartCounts()
 endfunction
 
 Function UpdateVars()
-	OSDataFile = "OutfitShuffler\\OSNPCData.ini"
 	OSLogFile = "OutfitShuffler"
 	OSModEnabled=GetModSettingBool("OutfitShuffler", "bIsEnabled:General") as Bool
 	OSOutfitOneShot=GetModSettingBool("OutfitShuffler", "bOutfitOneShot:General") as Bool
@@ -946,7 +966,6 @@ function ResetNPC(Actor NPC)
 
 	NPC.SetValue(OSMaintTime,GetCurrentGameTime())
 	NPC.SetValue(OSMaintWait,999)
-	ResetCustomConfigOptions(OSDataFile,IntToHexString(NPC.GetFormID()),None, None)
 endfunction
 
 bool Function PowerArmorCheck(Actor NPC) Global
@@ -1030,7 +1049,6 @@ Function DebugNPC(String NPCString="")
 		DebugLogString+="\n   ****************Sex:"+NPCSex
 		DebugLogString+="\n   ***************Race:"+NPC.GetLeveledActorBase().GetRace()
 		DebugLogString+="\n   **DC/AC-DS/AS-DB/AB:"+(NPC.GetItemCount(OSDontChangeItem) as Bool)+"/"+(NPC.GetItemCount(OSAlwaysChangeItem) as Bool)+"-"+(NPC.GetItemCount(OSDontScaleItem) as Bool)+"/"+(NPC.GetItemCount(OSAlwaysScaleItem) as Bool)+"-"+(NPC.GetItemCount(OSDontBodyGenItem) as Bool)+"/"+(NPC.GetItemCount(OSAlwaysBodyGenItem) as Bool)
-		DebugLogString+="\n   *********OSBodyDone:"+NPC.GetValue(OSBodyDone) as Bool
 		DebugLogString+="\n   **********IsDeleted:"+NPC.IsDeleted() as Bool
 		DebugLogString+="\n   *********IsDisabled:"+NPC.IsDisabled() as Bool
 		DebugLogString+="\n   ****PowerArmorCheck:"+PowerArmorCheck(NPC) as Bool
@@ -1062,11 +1080,10 @@ Function ChangeNow()
 	UpdateVars()
 	Actor NPC = LastCrossHairActor()
 	If NPC != None
-		NPC.RemoveSpell(OSMaintenanceSpell)
-		dlog(NPC+""+NPC.GetLeveledActorBase().GetName()+" will be changed immediately",1)
-		NPC.SetValue(OSMaintWait,1)
-		ResetNPC(NPC)
+		dlog(NPC+""+NPC.GetLeveledActorBase().GetName()+"'s OUTFIT will be changed ASAP!",1)
 		NPC.SetValue(OSMaintWait, 999)
+		NPC.SetValue(OSMaintTime, 999)
+		NPC.SetValue(OSNPCVersion, 999)
 	endif
 endfunction
 
@@ -1091,16 +1108,18 @@ EndFunction
 
 Function MCMBodyGen()
 	Actor NPC = LastCrossHairActor()
-	dlog(NPC+""+NPC.GetLeveledActorBase().GetName()+" will be changed immediately",1)
-	BodyGen.RegenerateMorphs(NPC, true)
-	float NPCNewScale
-	if (GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float) >= (GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float)
-		NPCNewScale=(GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float)
-	else
-		NPCNewScale = RandomFloat((GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float), (GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float))
+	If NPC != None
+		dlog(NPC+""+NPC.GetLeveledActorBase().GetName()+"'s BODY will be changed immediately",1)
+		BodyGen.RegenerateMorphs(NPC, true)
+		float NPCNewScale
+		if (GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float) >= (GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float)
+			NPCNewScale=(GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float)
+		else
+			NPCNewScale = RandomFloat((GetModSettingFloat("OutfitShuffler", "fNPCMinScale:General") as Float), (GetModSettingFloat("OutfitShuffler", "fNPCMaxScale:General") as Float))
+		endif
+		If OSBodyGenOneShot==1&&NPC.GetItemCount(OSAlwaysBodyGenItem)==0
+			NPC.AddItem(OSDontBodyGenItem,1,true)	
+		endif
+		NPC.SetScale(NPCNewScale)
 	endif
-	If OSBodyGenOneShot==1
-		NPC.AddItem(OSDontBodyGenItem,1,true)	
-	endif
-	NPC.SetScale(NPCNewScale)
 endFunction
